@@ -1,12 +1,47 @@
 <template>
   <div id="app">
-    <router-view/>
+    <router-view v-if="loadFinish"></router-view>
   </div>
 </template>
 
 <script>
+  import api from '@/api/api'
+  import {MessageBox} from 'mint-ui';
+
   export default {
-    name: 'App'
+    data() {
+      return {
+        openId: '',
+        loadFinish: false
+      }
+    },
+    methods: {
+      getOpenId() {
+        api.post('/wx/getOpenId').then(res => {
+          if (res.code === 200) {
+            this.openId = res.data.openId;
+            if (this.openId === '') {
+              window.location.href = 'http://hbzkzpp.cn/wx/getOpenId';
+            }
+            localStorage.setItem('openId', this.openId);
+
+            api.post('/user/getUserId', {openId: this.openId}).then(res => {
+              if (res.code === 200) {
+                localStorage.setItem('userId', res.data.userId);
+                this.loadFinish = true
+              }
+            }).catch(err => {
+              MessageBox.alert(err, 'getUserId');
+            })
+          }
+        }).catch(err => {
+          window.location.href = 'http://hbzkzpp.cn/wx/getOpenId';
+        })
+      }
+    },
+    mounted() {
+      this.getOpenId();
+    }
   }
 </script>
 

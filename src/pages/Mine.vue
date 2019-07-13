@@ -2,21 +2,21 @@
   <div>
     <div class="head">
       <div class="avatar">
-        <img src="../../static/images/23.jpg" alt="">
+        <img :src="userInfo.headimgurl" alt="">
       </div>
-      <p class="nickName">尊贵的友大大</p>
+      <p class="nickName">{{userInfo.nickname}}</p>
       <p class="summary">欢迎您选择本平台</p>
     </div>
     <div class="tabs">
-      <div class="tab">
+      <div class="tab" @click="toOrder('1')">
         <img src="../../static/images/allOrders.png" class="pic">
         <p class="sub">全部订单</p>
       </div>
-      <div class="tab">
+      <div class="tab" @click="toOrder('2')">
         <img src="../../static/images/unpay.png" class="pic">
         <p class="sub">未付款</p>
       </div>
-      <div class="tab">
+      <div class="tab" @click="toOrder('3')">
         <img src="../../static/images/unsend.png" class="pic">
         <p class="sub">已付款</p>
       </div>
@@ -35,27 +35,48 @@
     </div>
     <div class="mask" v-if="codeShow" @click="codeShow = false">
       <div class="subCode">
-        <img src="../../static/images/card.png">
+        <img src="../../static/images/card.jpg">
       </div>
     </div>
   </div>
 </template>
 
 <script>
+  import api from '@/api/api';
+  import {MessageBox, Toast} from 'mint-ui';
   export default {
-    data () {
+    data() {
       return {
         selected: '1',
         codeShow: false,
+        userInfo:{}
       }
     },
     methods: {
-      toRouter (path) {
+      toRouter(path) {
         this.$router.push({path})
+      },
+      toOrder(params) {
+        this.$router.push({path: '/order', query: {tab: params}})
+      },
+      getUserInfo() {
+        api.post('/wx/getUserInfo').then(res => {
+          if (res.code === 200) {
+            this.userInfo = res.data;
+          } else {
+            Toast({
+              message: res.message
+            });
+          }
+        }).catch(err => {
+          Toast({
+            message: res.message
+          });
+        })
       }
     },
-    mounted () {
-
+    mounted() {
+      this.getUserInfo()
     }
   }
 </script>
@@ -129,6 +150,7 @@
   .content {
     padding-top: px2rem(40px);
     background-color: #ffffff;
+
     .slide {
       width: 100%;
       height: px2rem(80px);
@@ -143,10 +165,10 @@
 
       .font {
         float: left;
-        font-size: px2rem(28px);
+        font-size: px2rem(24px);
         color: #4E4E4E;
         margin-left: px2rem(20px);
-       margin-top: px2rem(4px);
+        margin-top: px2rem(4px);
       }
 
       .arrow {

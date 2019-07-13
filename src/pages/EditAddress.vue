@@ -1,17 +1,17 @@
 <template>
   <div>
-    <mt-header title="管理收货地址" class="header">
+    <mt-header title="修改收货地址" class="header">
       <mt-button icon="back" slot="left" @click.native="goBack">返回</mt-button>
     </mt-header>
     <div class="content">
       <div class="form">
         <div class="phone bottom">
           <p class="label">收货人</p>
-          <input type="text" class="input" placeholder="请输入收货人" v-model="name">
+          <input type="text" class="input" v-model="name">
         </div>
         <div class="phone bottom">
           <p class="label">联系电话</p>
-          <input type="text" class="input" placeholder="请输入联系电话" v-model="mobile">
+          <input type="text" class="input" v-model="mobile">
         </div>
         <div class="phone bottom">
           <p class="label">所在地区</p>
@@ -20,7 +20,7 @@
         <div class="phone">
           <p class="label">详细地址</p>
           <textarea class="address" name="address" cols="40" rows="2" v-model="addressDetail"
-                    placeholder="请输入详细地址信息"></textarea>
+                    placeholder="请输入详细地址信息，如道路、门牌号、小区楼栋号、单元室等"></textarea>
         </div>
       </div>
       <div class="btn">
@@ -31,51 +31,58 @@
 </template>
 
 <script>
-  import api from '@/api/api';
-  import { Toast  } from 'mint-ui';
+  import api from '@/api/api'
+  import {MessageBox, Toast} from 'mint-ui';
   export default {
-    data () {
+    data() {
       return {
+        id: '',
         name: '',
         mobile: '',
-        area: '',
         addressDetail: '',
         addressArea: [],
-        cityData: []
+        cityData :[]
       }
     },
     methods: {
-      goBack () {
+      goBack() {
         this.$router.go(-1)
-      },
-      toRouter (path) {
-        this.$router.push({path})
       },
       addAddress() {
         const vm = this;
-        api.post('/address/add', {
+        api.post('/address/update', {
           name: vm.name,
           mobile: vm.mobile,
-          userId: localStorage.getItem('userId') || 'a9755b894fbb4cc59def8455d3902762',
+          id: vm.id,
           addressArea: vm.addressArea.join(),
           addressDetail: vm.addressDetail
         }).then(res => {
           if (res.code === 200) {
             Toast({
-              message: '添加成功',
+              message: '修改成功'
             });
             vm.$router.push({path: '/address'})
+          } else {
+
           }
+        }).catch(err => {
+
         })
-      },
+      }
     },
-    mounted () {
-      const vm = this
-      $('#city-picker').cityPicker({
-        title: '选择省市区/县',
+    mounted() {
+      this.id = this.$route.query.id;
+      this.name = this.$route.query.name;
+      this.mobile = this.$route.query.mobile;
+      this.addressArea = this.$route.query.addressArea.split(',');
+      this.addressDetail = this.$route.query.addressDetail;
+
+      const vm = this;
+      $("#city-picker").cityPicker({
+        title: "选择省市区/县",
         onChange: function (picker, values, displayValues) {
-          console.log(values, displayValues)
-          vm.addressArea = displayValues
+          console.log(values, displayValues);
+          vm.addressArea = displayValues;
         }
       });
     }
@@ -86,52 +93,67 @@
   @import "../assets/css/function.scss";
 
   .content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin-top: px2rem(88px);
+    background-color: #f2f2f2;
     overflow: hidden;
     .form {
       width: 100%;
       overflow: hidden;
       background-color: #ffffff;
       padding: 0 px2rem(24px);
-      box-sizing: border-box;
       .phone {
-        min-height: px2rem(56px);
-        display: flex;
-        margin: px2rem(12px) 0;
+        min-height: px2rem(96px);
         .label {
-          width: px2rem(130px);
-          font-size: px2rem(24px);
+          float: left;
+          width: px2rem(132px);
+          margin-top: px2rem(32px);
+          font-size: px2rem(30px);
           color: #3F3F3F;
-          line-height: px2rem(60px);
-          white-space: nowrap;
         }
         .input {
-          flex: 1;
-          height: px2rem(58px);
+          float: left;
+          width: px2rem(380px);
+          height: px2rem(60px);
           color: #989898;
-          font-size: px2rem(24px);
-          margin-left: px2rem(20px);
+          font-size: px2rem(30px);
+          margin-top: px2rem(24px);
+          margin-left: px2rem(30px);
           border: none;
         }
         .input:focus, .code:focus {
           outline: none;
         }
+        .code {
+          float: right;
+          width: px2rem(160px);
+          height: px2rem(46px);
+          background-color: #ffffff;
+          margin-top: px2rem(26px);
+          border: px2rem(1px) solid #BEAD8A;
+          color: #BEAD8A;
+          font-size: px2rem(24px);
+          border-radius: 100px;
+          padding: 0 px2rem(15px);
+        }
         .address {
-          min-height: px2rem(58px);
-          margin-left: px2rem(20px);
-          margin-top: px2rem(16px);
-          margin-bottom: px2rem(50px);
+          float: left;
+          margin-left: px2rem(24px);
+          margin-top: px2rem(32px);
+          margin-bottom: px2rem(70px);
           border: none;
           resize: none;
-          font-family: 微软雅黑, "Microsoft YaHei", "Helvetica Neue", "Helvetica Neue", Helvetica, "Hiragino Sans GB", tahoma, arial, sans-serif;
-          color: #878b8a;
-          font-size: px2rem(24px);
         }
         .address:focus {
           outline: none;
         }
       }
       .phone.bottom {
-        height: px2rem(60px);
+        height: px2rem(96px);
         border-bottom: px2rem(1px) solid #DFDFDF;
         .select {
           width: px2rem(400px);
@@ -149,6 +171,7 @@
       height: px2rem(60px);
       padding: 0 px2rem(24px);
       box-sizing: border-box;
+
       .login {
         width: 100%;
         height: 100%;
@@ -157,7 +180,10 @@
         border: px2rem(1px) solid #DE2D2E;
         background: #DE2D2E !important;
       }
+
+      .login:focus {
+        box-shadow: 0 0 0 2px rgba(190, 173, 138, .2);
+      }
     }
   }
 </style>
-

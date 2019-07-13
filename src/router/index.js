@@ -1,13 +1,13 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+// import Vue from 'vue'
+// import Router from 'vue-router'
 
-Vue.use(Router)
+Vue.use(VueRouter)
 
-export default new Router({
+export default new VueRouter({
   routes: [
     {
       path: '*',
-      redirect: '/login'
+      redirect: '/home'
     },
     {
       path: '/',
@@ -53,6 +53,10 @@ export default new Router({
       path: '/addAddress',
       name: 'AddAddress',
       component: resolve => require(['../pages/AddAddress.vue'], resolve),
+    },{
+      path: '/editAddress',
+      name: 'EditAddress',
+      component: resolve => require(['../pages/EditAddress.vue'], resolve)
     },
   ]
 })

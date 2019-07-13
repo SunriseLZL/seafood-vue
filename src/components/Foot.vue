@@ -17,19 +17,24 @@
 
 <script>
   export default {
-    data () {
+    data() {
       return {
-        selected: 'Home'
+        // selected: 'Home'
+      }
+    },
+    computed: {
+      selected() {
+        return this.$route.name || 'Home'
       }
     },
     methods: {
-      toRouter (path) {
+      toRouter(path) {
         this.$router.push({path})
       }
     },
-    created () {
-      this.selected = this.$route.name
-      console.log(this.selected)
+    created() {
+      // this.selected = this.$route.name
+      // console.log(this.selected)
     }
   }
 </script>

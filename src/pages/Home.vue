@@ -2,80 +2,114 @@
   <div>
     <div class="swipe-box">
       <mt-swipe :auto="4000">
-        <mt-swipe-item>
+        <mt-swipe-item v-for="item in banners" :key="item.id">
           <div class="img-wrap">
-            <img src="../../static/images/1.jpg">
-          </div>
-        </mt-swipe-item>
-        <mt-swipe-item>
-          <div class="img-wrap">
-            <img src="../../static/images/2.jpg">
-          </div>
-        </mt-swipe-item>
-        <mt-swipe-item>
-          <div class="img-wrap">
-            <img src="../../static/images/3.jpg">
+            <img :src="item.photo">
           </div>
         </mt-swipe-item>
       </mt-swipe>
     </div>
     <div class="goods-list">
-      <div class="row">
-        <div class="picture" @click="toRouter('/buy',{id:100})">
-          <img src="../../static/images/23.jpg">
+      <div class="row" v-for="item in goodsList">
+        <div class="picture" @click="toRouter('/buy',{id:item.id})">
+          <img v-lazy="item.photo">
         </div>
-        <div class="right-content" @click="toRouter('/buy',{id:100})">
-          <p class="good-name">我是大闸蟹</p>
-          <p class="good-remain">仅剩 500 斤</p>
-          <p class="good-price">惊爆价<span class="flag">￥</span>20<span class="discount">原价￥15</span></p>
-        </div>
-        <div class="buy">
-          <div class="core-buy">
-            <div class="circle-plus"><i class="fa  fa-minus-circle fa-fw"></i></div>
-            <input placeholder="0" class="input-number" v-model="food_count"/>
-            <div class="circle-plus"><i class="fa  fa-plus-circle fa-fw"></i></div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="picture" @click="toRouter('/buy',{id:100})">
-          <img src="../../static/images/23.jpg">
-        </div>
-        <div class="right-content">
-          <p class="good-name">我是大闸蟹</p>
-          <p class="good-remain">仅剩 500 斤</p>
-          <p class="good-price">惊爆价<span class="flag">￥</span>20<span class="discount">原价￥15</span></p>
+        <div class="right-content" @click="toRouter('/buy',{id:item.id})">
+          <p class="good-name">{{item.title}}</p>
+          <p class="good-remain">仅剩 {{item.num}}斤</p>
+          <p class="good-price">批发价<span class="flag">￥</span>{{item.wholesalePrice}}<span class="discount">零售价￥{{item.retailPrice}}</span>
+          </p>
         </div>
         <div class="buy">
           <div class="core-buy">
-            <div class="circle-plus"><i class="fa  fa-plus-circle fa-fw"></i></div>
+            <div class="circle-plus" @click="delAmount(item.id)"><i class="fa  fa-minus-circle fa-fw"></i></div>
+            <input placeholder="0" class="input-number" v-model="item.amount"/>
+            <div class="circle-plus" @click="addAmount(item.id)"><i class="fa  fa-plus-circle fa-fw"></i></div>
           </div>
         </div>
       </div>
     </div>
-    <div class="shopping-cart" @click="toRouter('/shoppingCart')">
+    <div class="shopping-cart animated fadeIn" v-if="goodsTotal > 0" @click="toShoppingCart">
       <i class="fa fa-shopping-cart fa-fw"></i>
-      <p class="shop-amount">10</p>
+      <p class="shop-amount">{{goodsTotal}}</p>
     </div>
   </div>
 </template>
 
 <script>
+  import api from '@/api/api';
+
   export default {
-    data () {
+    data() {
       return {
-        food_count: 10
+        banners: [],
+        goodsList: [],
+      };
+    },
+    computed: {
+      goodsTotal() {
+        let total = 0;
+        this.goodsList.forEach((item) => {
+          total += item.amount;
+        });
+        return total;
       }
     },
     methods: {
-      toRouter (path, params = {}) {
-        this.$router.push({path, query: {...params}})
+      toRouter(path, params = {}) {
+        this.$router.push({path, query: {...params}});
+      },
+      toShoppingCart() {
+        const params = [];
+        this.goodsList.forEach((item) => {
+          if (item.amount > 0) {
+            params.push(item);
+          }
+        });
+        localStorage.setItem('goodsList',JSON.stringify(params));
+        this.$router.push({path: '/shoppingCart'});
+      },
+      addAmount(id) {
+        this.goodsList.map((item, index) => {
+          if (item.id === id) {
+            this.$set(this.goodsList, index, {
+              ...this.goodsList[index],
+              amount: this.goodsList[index].amount + 1
+            });
+          }
+        });
+      },
+      delAmount(id) {
+        this.goodsList.map((item, index) => {
+          if (item.id === id) {
+            if (this.goodsList[index].amount > 0) {
+              this.$set(this.goodsList, index, {
+                ...this.goodsList[index],
+                amount: this.goodsList[index].amount - 1
+              });
+            }
+          }
+        });
+      },
+      getGoodsList() {
+        api.post('/goods/list').then((res) => {
+          console.log(res);
+          this.banners = res.data.banners;
+          this.goodsList = res.data.goodsList.map((item) => {
+            return {
+              ...item,
+              amount: 0
+            };
+          });
+        }).catch((error) => {
+          console.log(error);
+        });
       }
     },
-    mounted () {
-
+    mounted() {
+      this.getGoodsList();
     }
-  }
+  };
 </script>
 
 <style lang="scss" scoped="" rel="stylesheet/scss">
@@ -83,11 +117,12 @@
 
   .swipe-box {
     width: 100%;
-    height: px2rem(400px);
+    height: px2rem(300px);
   }
 
   .goods-list {
-    min-height: px2rem(400px);
+    min-height: px2rem(600px);
+    margin-bottom: px2rem(100px);
   }
 
   .img-wrap {
@@ -129,15 +164,15 @@
     }
 
     .good-name {
-      font-size: px2rem(32px);
+      font-size: px2rem(24px);
       color: #2B2B2B;
     }
 
     .good-remain {
       position: absolute;
       left: px2rem(16px);
-      bottom: px2rem(50px);
-      font-size: px2rem(24px);
+      bottom: px2rem(40px);
+      font-size: px2rem(20px);
       color: #A4A4A4;
     }
 

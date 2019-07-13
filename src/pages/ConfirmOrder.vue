@@ -1,19 +1,24 @@
 <template>
   <div>
     <mt-header title="确认订单" class="header">
-      <mt-button @click="toShoppingCart" icon="back" slot="left">返回</mt-button>
+      <!--      <mt-button @click="toShoppingCart" icon="back" slot="left">返回</mt-button>-->
     </mt-header>
-    <div class="addressFirm">
-      <p class="name">收货人：gdsgfdfgdfg</p>
-      <p class="phone">13242344</p>
-      <p class="address">收货地址：wqeqwewdas</p>
+    <div class="addressFirm" v-if="addressList.length > 0">
+      <p class="name">收货人：{{addressInfo.name}}</p>
+      <p class="phone">{{addressInfo.mobile}}</p>
+      <p class="address">收货地址：{{addressInfo.address}}</p>
     </div>
-    <div class="row">
-      <img src="../../static/images/23.jpg" class="picture">
+    <div class="addressSect" v-else>
+      <p class="left">您还没有填写收货地址，为了以后更好的购物体验，现在就去添加收货地址吧！</p>
+      <p class="right" @click="toAddAddress">去添加&nbsp;&#62;</p>
+    </div>
+    <div class="row" v-for="good in goodsList">
+      <img :src="good.photo" class="picture">
       <div class="right-content">
-        <p class="good-name">我是大闸蟹</p>
-        <p class="good-remain">仅剩 500 斤</p>
-        <p class="good-price">惊爆价<span class="flag">￥</span>20<span class="discount">原价￥15</span></p>
+        <p class="good-name">{{good.title}}</p>
+        <!--        <p class="good-remain">仅剩 500 斤</p>-->
+        <p class="good-price">批发价<span class="flag">￥</span>{{good.retailPrice}}<span class="discount">零售价￥{{good.wholesalePrice}}</span>
+        </p>
       </div>
       <div class="buy">x1</div>
     </div>
@@ -23,7 +28,7 @@
     <div class="goodMoney">
       <div class="sect">
         <div class="label">商品金额：</div>
-        <div class="price">￥145</div>
+        <div class="price">￥{{totalPrice}}</div>
       </div>
       <div class="sect">
         <div class="label">运费：</div>
@@ -31,32 +36,129 @@
       </div>
       <div class="sect">
         <div class="label">合计：</div>
-        <div class="price">￥435345</div>
+        <div class="price">￥{{totalPrice}}</div>
       </div>
       <div class="sect money">
         <div class="label">支付方式：</div>
         <div class="free">微信</div>
       </div>
     </div>
-    <div class="submit">提交订单</div>
+    <div class="submit" @click="addOrder">提交订单</div>
   </div>
 </template>
 
 
 <script>
+  import api from '@/api/api';
+  import {MessageBox, Toast} from 'mint-ui';
   export default {
-    data () {
+    data() {
       return {
-        orderNote: ''
+        orderNote: '',
+        orderId: '',
+        openId: '',
+        payObject: {},
+        addressList: [],
+        goodsList: [],
+        addressInfo: {
+          id: '',
+          name: '',
+          mobile: '',
+          address: ''
+        }
+      }
+    },
+    computed: {
+      totalPrice() {
+        let total = 0;
+        if (this.goodsList && this.goodsList.length > 0) {
+          this.goodsList.forEach(item => {
+            console.log(item)
+            total += item.amount * item.retailPrice;
+          });
+        }
+        return total;
       }
     },
     methods: {
-      toShoppingCart () {
+      toAddAddress() {
+        this.$router.replace({path: '/addAddress'})
+      },
+      toShoppingCart() {
         this.$router.push({path: '/shoppingCart'})
-      }
+      },
+      getAddress() {
+        api.post('/address/select', {"userId": localStorage.getItem('userId') || 'a9755b894fbb4cc59def8455d3902762'}).then(res => {
+          if (res.code === 200) {
+            this.addressList = res.data;
+            this.addressInfo = {
+              id: this.addressList[0].id,
+              name: this.addressList[0].name,
+              mobile: this.addressList[0].mobile,
+              address: this.addressList[0].addressArea + this.addressList[0].addressDetail,
+            }
+          }
+        })
+      },
+      addOrder() {
+        if (!this.addressList.length) {
+          MessageBox.alert('请先填写收获地址', '提示');
+          return false;
+        }
+        // 添加订单获取订单id后支付
+        api.post('/order/add', {
+          userId: localStorage.getItem('userId') || 'a9755b894fbb4cc59def8455d3902762',
+          goodsList: this.goodsList.map(item => {
+            return {
+              "goodsId": item.id,
+              "goodsNum": item.amount
+            }
+          }),
+          goodsTotal: this.totalPrice,
+          orderNote: this.orderNote,
+          addressId: this.addressInfo.id,
+        }).then(res => {
+          if (res.code === 200) {
+            this.orderId = res.data.orderId;
+            this.wxPay();
+          }
+        })
+      },
+      wxPay() {
+        api.post('/wx/orderPay', {orderId: this.orderId, openId: this.openId}).then(res => {
+          if (res.code === 200) {
+            this.payObject = res.data;
+            if (typeof WeixinJSBridge == "undefined") {
+              if (document.addEventListener) {
+                document.addEventListener('WeixinJSBridgeReady', this.onBridgeReady, false);
+              } else if (document.attachEvent) {
+                document.attachEvent('WeixinJSBridgeReady', this.onBridgeReady);
+                document.attachEvent('onWeixinJSBridgeReady', this.onBridgeReady);
+              }
+            } else {
+              this.onBridgeReady();
+            }
+          }
+        })
+      },
+      onBridgeReady() {
+        WeixinJSBridge.invoke(
+          'getBrandWCPayRequest', this.payObject,
+          function (res) {
+            if (res.err_msg === "get_brand_wcpay_request:ok") {
+              MessageBox('提示', '支付成功!');
+            } else {
+              MessageBox('提示', '支付失败!');
+            }
+          }
+        );
+      },
     },
-    mounted () {
-
+    mounted() {
+      this.goodsList = JSON.parse(localStorage.getItem('goodsList'));
+      console.log(this.goodsList)
+      this.getAddress();
+      this.openId = localStorage.getItem('openId');
     }
   }
 </script>
@@ -73,8 +175,14 @@
     box-sizing: border-box;
 
     .picture {
-      width: px2rem(240px);
-      height: px2rem(240px);
+      width: px2rem(160px);
+      height: px2rem(130px);
+
+      img {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
     }
 
     .right-content {
@@ -84,15 +192,15 @@
       position: relative;
 
       .good-name {
-        font-size: px2rem(32px);
+        font-size: px2rem(24px);
         color: #2B2B2B;
       }
 
       .good-remain {
         position: absolute;
         left: px2rem(16px);
-        bottom: px2rem(50px);
-        font-size: px2rem(24px);
+        bottom: px2rem(40px);
+        font-size: px2rem(20px);
         color: #A4A4A4;
       }
 
@@ -100,7 +208,7 @@
         position: absolute;
         left: px2rem(16px);
         bottom: 0;
-        font-size: px2rem(28px);
+        font-size: px2rem(22px);
         color: #DE2D2E;
 
         .flag {
@@ -116,25 +224,29 @@
       }
     }
 
-    .circle-plus {
-      width: px2rem(40px);
-      height: px2rem(40px);
-      line-height: px2rem(40px);
-      border-radius: 50%;
-      text-align: center;
-      color: #DE2D2E;
-      font-size: px2rem(40px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
     .buy {
       flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
       margin-right: px2rem(16px);
+    }
+  }
+
+  .addressSect {
+    width: 100%;
+    height: px2rem(100px);
+    background-color: #ffffff;
+    padding: px2rem(67px) px2rem(28px);
+    display: flex;
+
+    .left {
+      width: px2rem(400px);
+    }
+
+    .right {
+      color: #989898;
+      margin-top: px2rem(15px);
     }
   }
 
@@ -183,33 +295,33 @@
       .label {
         float: left;
         margin-top: px2rem(5px);
-        font-size: px2rem(28px);
+        font-size: px2rem(24px);
       }
 
       .price {
         float: right;
-        font-size: px2rem(36px);
+        font-size: px2rem(24px);
         color: #DE2D2E;
       }
 
       .free {
         float: right;
-        font-size: px2rem(36px);
+        font-size: px2rem(24px);
       }
     }
 
     .sect.money {
-      margin-top: px2rem(60px);
+      margin-top: px2rem(20px);
     }
   }
 
   .submit {
     width: 100%;
-    height: px2rem(98px);
+    height: px2rem(60px);
     background: #DE2D2E;
     text-align: center;
-    line-height: px2rem(98px);
-    font-size: px2rem(36px);
+    line-height: px2rem(60px);
+    font-size: px2rem(28px);
     color: #FFFFFF;
     margin-top: px2rem(60px);
   }

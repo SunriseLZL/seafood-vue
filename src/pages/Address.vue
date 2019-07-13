@@ -5,46 +5,23 @@
     </mt-header>
     <div class="content">
       <div class="form">
-        <div class="section">
+        <div class="section" v-for="item in addressList">
           <div class="info">
-            <p class="name">都是分开录</p>
-            <p class="phone">16822223151</p>
+            <p class="name">{{item.name}}</p>
+            <p class="phone">{{item.mobile}}</p>
             <p class="realAdd">
-              健康的事故发生可见度发挥，上雕刻技法和告诉大家看法和，士大夫河南山东科技孵化
+              {{item.addressArea+item.addressDetail}}
             </p>
           </div>
           <div class="btnGroup">
             <div class="edit">
-              <div class="wrap">
+              <div class="wrap" @click="edit(item)">
                 <img src="../../static/images/edit_icon.png" class="pic">
                 <span class="font">编辑</span>
               </div>
             </div>
             <div class="edit">
-              <div class="wrap">
-                <img src="../../static/images/delete_icon.png" class="pic">
-                <span class="font">删除</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="section">
-          <div class="info">
-            <p class="name">李智龙</p>
-            <p class="phone">18758286741</p>
-            <p class="realAdd">
-              浙江省杭州市萧山区浦沿街道123后
-            </p>
-          </div>
-          <div class="btnGroup">
-            <div class="edit">
-              <div class="wrap">
-                <img src="../../static/images/edit_icon.png" class="pic">
-                <span class="font">编辑</span>
-              </div>
-            </div>
-            <div class="edit">
-              <div class="wrap">
+              <div class="wrap" @click="del(item.id)">
                 <img src="../../static/images/delete_icon.png" class="pic">
                 <span class="font">删除</span>
               </div>
@@ -60,20 +37,64 @@
 </template>
 
 <script>
+  import api from '@/api/api';
+  import {MessageBox, Toast} from 'mint-ui';
+
   export default {
-    data () {
-      return {}
-    },
-    methods: {
-      goBack () {
-        this.$router.go(-1)
-      },
-      toRouter (path) {
-        this.$router.push({path})
+    data() {
+      return {
+        addressList: []
       }
     },
-    mounted () {
-
+    methods: {
+      goBack() {
+        this.$router.go(-1)
+      },
+      toRouter(path) {
+        this.$router.push({path})
+      },
+      del(id) {
+        const vm = this;
+        MessageBox.confirm('确定要删除吗?').then(action => {
+          api.post('/address/delete', {id: id}).then(res => {
+            if (res.code === 200) {
+              Toast({
+                message: '删除成功'
+              });
+              vm.init();
+            } else {
+              Toast({
+                message: res.message
+              });
+            }
+          }).catch(err => {
+            Toast({
+              message: res.message
+            });
+          })
+        });
+      },
+      edit(item) {
+        this.$router.push({path: '/editAddress', query: {...item}})
+      },
+      add() {
+        this.$router.push({path: '/addAddress'})
+      },
+      init() {
+        api.post('/address/select', {"userId": localStorage.getItem('userId') || 'a9755b894fbb4cc59def8455d3902762'}).then(res => {
+          if (res.code === 200) {
+            this.addressList = res.data;
+            console.log(this.addressList);
+          } else {
+            this.$Message.error(res.message)
+          }
+        }).catch(err => {
+          this.$Message.error(err)
+        })
+      }
+    },
+    mounted() {
+      this.init()
     }
   }
 </script>
@@ -93,7 +114,8 @@
 
     .form {
       width: 100%;
-      overflow: hidden;
+      height: 100%;
+      overflow: auto;
 
       .section {
         width: 100%;
@@ -157,9 +179,10 @@
 
               .pic {
                 float: left;
-                width: px2rem(48px);
+                width: px2rem(40px);
+                height: px2rem(40px);
                 /*height: px2rem(50px);*/
-                padding: px2rem(5px);
+                padding: px2rem(4px);
               }
             }
           }
@@ -173,17 +196,19 @@
     bottom: px2rem(20px);
     left: 0;
     width: 100%;
-    height: px2rem(68px);
+    height: px2rem(60px);
     padding: 0 px2rem(24px);
     box-sizing: border-box;
+
     .login {
       width: 100%;
       height: 100%;
-      font-size: px2rem(36px);
+      font-size: px2rem(28px);
       color: #FFFFFF;
       border: px2rem(1px) solid #DE2D2E;
       background: #DE2D2E !important;
     }
+
     .login:focus {
       box-shadow: 0 0 0 2px rgba(190, 173, 138, .2);
     }

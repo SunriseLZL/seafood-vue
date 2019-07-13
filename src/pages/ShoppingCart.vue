@@ -1,60 +1,42 @@
 <template>
   <div>
-    <mt-header title="购物车(50)" class="header">
+    <mt-header :title="`购物车(${totalCount})`" class="header">
       <mt-button slot="right">编辑</mt-button>
     </mt-header>
 
     <div class="goods-list">
-      <div class="row">
-        <div class="circle">
-          <div class="core">
-            <i class="fa  fa-check-circle fa-fw"></i>
-          </div>
-        </div>
-        <img src="../../static/images/23.jpg" class="picture">
-        <div class="right-content">
-          <p class="good-name">我是大闸蟹</p>
-          <p class="good-remain">仅剩 500 斤</p>
-          <p class="good-price">惊爆价<span class="flag">￥</span>20<span class="discount">原价￥15</span></p>
-        </div>
-        <div class="buy">
-          <div class="core-buy">x1</div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="circle active">
+      <div class="row" v-for="(good,index) in goodsList">
+        <div class="circle" :class="{'active':good.select}" @click="choose(good.id)">
           <div class="core">
             <i class="fa fa-check-circle fa-fw"></i>
           </div>
         </div>
-        <img src="../../static/images/23.jpg" class="picture">
+        <img :src="good.photo" class="picture" @click="getIndex(index)">
         <div class="right-content">
-          <p class="good-name">我是大闸蟹</p>
-          <p class="good-remain">仅剩 500 斤</p>
-          <p class="good-price">惊爆价<span class="flag">￥</span>20<span class="discount">原价￥15</span></p>
+          <p class="good-name">{{good.title}}</p>
+          <p class="good-remain">仅剩 {{good.num}} 斤</p>
+          <p class="good-price">批发价<span class="flag">￥</span>{{good.wholesalePrice}}<span class="discount">零售价￥{{good.retailPrice}}</span>
+          </p>
         </div>
         <div class="buy">
-          <div class="core-buy">
-            <div class="circle-plus"><i class="fa fa-minus-circle fa-fw"></i></div>
-            <input placeholder="0" class="input-number" v-model="food_count"/>
-            <div class="circle-plus"><i class="fa fa-plus-circle fa-fw"></i></div>
-          </div>
+          <div class="core-buy">x{{good.amount}}</div>
         </div>
       </div>
     </div>
 
     <div class="selection">
-      <div class="circle">
+      <div class="circle" :class="{'active':all}" @click="pickAll">
         <div class="core">
           <i class="fa fa-check-circle fa-fw"></i>
         </div>
       </div>
-      <p class="all">全选</p>
+      <p class="all" @click="pickAll">全选</p>
       <p class="clean">合计：</p>
-      <p class="price">￥1024</p>
+      <p class="price">￥{{totalPrice}}</p>
       <div class="del">
-        <div class="btn-save">预约</div>
-        <div class="btn-buy" @click="confirmOrder">下单</div>
+        <div class="btn-save" v-if="false">预约</div>
+        <div class="btn-save"></div>
+        <div class="btn-buy" @click="submitOrder">下单</div>
       </div>
     </div>
   </div>
@@ -62,22 +44,97 @@
 </template>
 
 <script>
+  import api from '@/api/api';
+  import {MessageBox, Toast} from 'mint-ui';
   export default {
-    data () {
+    data() {
       return {
-        food_count: 10
+        food_count: 10,
+        selectCount: 0,
+        editAble: false,
+        goodsList: []
+      }
+    },
+    computed: {
+      all() {
+        for (let i = 0; i < this.goodsList.length; i++) {
+          if (!this.goodsList[i].select) {
+            return false;
+          }
+        }
+        return true
+      },
+      totalCount() {
+        return this.goodsList.length
+      },
+      totalPrice() {
+        let total = 0;
+        this.goodsList.forEach(item => {
+          if (item.select) {
+            total += item.wholesalePrice * item.amount
+          }
+        });
+        return total;
       }
     },
     methods: {
-      toShoppingCart () {
+      toShoppingCart() {
         this.$router.push({path: '/shoppingCart'})
       },
-      confirmOrder () {
-        this.$router.push({path: '/confirmOrder'})
-      }
+      getIndex(index) {
+        console.log(index)
+      },
+      submitOrder() {
+        let count = 0;
+        const goodsList = [];
+        this.goodsList.map(item => {
+          console.log(item)
+          if (item.select) {
+            count++;
+            goodsList.push({
+              ...item
+            });
+          }
+        });
+        this.selectCount = count;
+        if (this.selectCount > 0) {
+          localStorage.setItem('goodsList',JSON.stringify(goodsList));
+          this.$router.push({path: '/confirmOrder'})
+        } else {
+          MessageBox.alert('您还未选择商品哦~', '提示');
+        }
+      },
+      choose(id) {
+        this.goodsList.map((item, index) => {
+          if (item.id === id) {
+            this.$set(this.goodsList, index, {
+              ...this.goodsList[index],
+              select: !this.goodsList[index].select
+            })
+          }
+        })
+      },
+      pickAll() {
+        if (this.all) {
+          this.goodsList.map((item, index) => {
+            this.$set(this.goodsList, index, {
+              ...this.goodsList[index],
+              select: false
+            })
+          })
+        } else {
+          this.goodsList.map((item, index) => {
+            this.$set(this.goodsList, index, {
+              ...this.goodsList[index],
+              select: true
+            })
+          })
+        }
+      },
     },
-    mounted () {
-
+    mounted() {
+      this.goodsList = JSON.parse(localStorage.getItem('goodsList'));
+      console.log(this.goodsList)
     }
   }
 </script>
@@ -95,7 +152,7 @@
     .picture {
       width: px2rem(160px);
       height: px2rem(130px);
-
+      display: block;
       img {
         width: 100%;
         height: 100%;
@@ -104,7 +161,7 @@
     }
 
     .circle {
-      width: px2rem(56px);
+      width: px2rem(36px);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -117,13 +174,13 @@
       }
 
       .core {
-        width: px2rem(40px);
-        height: px2rem(40px);
+        width: px2rem(28px);
+        height: px2rem(28px);
         background-color: #ffffff;
         border-radius: 50%;
         border: px2rem(2px) solid #DE2D2E;
         color: #de2d2e;
-        font-size: px2rem(40px);
+        font-size: px2rem(34px);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -137,21 +194,20 @@
 
   .right-content {
     width: px2rem(280px);
-    overflow: hidden;
     padding-left: px2rem(16px);
     position: relative;
   }
 
   .good-name {
-    font-size: px2rem(32px);
+    font-size: px2rem(24px);
     color: #2B2B2B;
   }
 
   .good-remain {
     position: absolute;
     left: px2rem(16px);
-    bottom: px2rem(50px);
-    font-size: px2rem(24px);
+    bottom: px2rem(40px);
+    font-size: px2rem(20px);
     color: #A4A4A4;
   }
 
@@ -227,7 +283,7 @@
     align-items: center;
 
     .circle {
-      width: px2rem(56px);
+      width: px2rem(36px);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -240,13 +296,13 @@
       }
 
       .core {
-        width: px2rem(40px);
-        height: px2rem(40px);
+        width: px2rem(30px);
+        height: px2rem(30px);
         background-color: #ffffff;
         border-radius: 50%;
         border: px2rem(2px) solid #DE2D2E;
         color: #de2d2e;
-        font-size: px2rem(40px);
+        font-size: px2rem(36px);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -278,7 +334,7 @@
         float: left;
         text-align: center;
         width: 50%;
-        background: #F99D27;
+        /*background: #F99D27;*/
         color: #ffffff;
         font-weight: bold;
         font-size: px2rem(24px);
