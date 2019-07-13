@@ -1,0 +1,9 @@
+/*布局适配*/
+/*调用方法：px2rem()*/
+@function px2rem($px, $base-font-size: 16px) {
+  @return ($px / $base-font-size) * 0.5rem;
+}
+
+.header {
+  background-color: #DE2D2E;;
+}
