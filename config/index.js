@@ -11,10 +11,13 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/': {
+      '/api': {
         target: 'http://hbzkzpp.cn',
         changeOrigin: true,
-        secure: false
+        secure: false,
+        pathRewrite: {
+          '^/api': ''//直接转发到zuul网关，请本地开发环境将pathRewrite注释掉
+        }
       },
     },
 
