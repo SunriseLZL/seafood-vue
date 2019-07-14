@@ -21,7 +21,7 @@
           if (res.code === 200) {
             this.openId = res.data.openId;
             if (this.openId === '') {
-              window.location.href = 'http://hbzkzpp.cn/wx/getOpenId';
+              window.location.href = 'http://hbzkzpp.cn/api/wx/getOpenId';
             }
             localStorage.setItem('openId', this.openId);
 
@@ -35,7 +35,7 @@
             })
           }
         }).catch(err => {
-          window.location.href = 'http://hbzkzpp.cn/wx/getOpenId';
+          window.location.href = 'http://hbzkzpp.cn/api/wx/getOpenId';
         })
       }
     },
