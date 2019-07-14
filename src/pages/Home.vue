@@ -93,7 +93,6 @@
       },
       getGoodsList() {
         api.post('/goods/list').then((res) => {
-          console.log(res);
           this.banners = res.data.banners;
           this.goodsList = res.data.goodsList.map((item) => {
             return {
@@ -104,10 +103,16 @@
         }).catch((error) => {
           console.log(error);
         });
+      },
+      aaa(){
+        api.post('/user/getOpenId').then(res => {
+          console.log(res)
+        })
       }
     },
     mounted() {
       this.getGoodsList();
+      this.aaa();
     }
   };
 </script>

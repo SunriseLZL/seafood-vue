@@ -4,8 +4,8 @@
 
 // axios初始化配置
 axios.defaults.timeout = 10000;
-// axios.defaults.baseURL = '/api/';
-axios.defaults.baseURL = '/';
+axios.defaults.baseURL = '/api/';
+// axios.defaults.baseURL = '/';
 
 // 请求状态拦截
 axios.interceptors.request.use(
