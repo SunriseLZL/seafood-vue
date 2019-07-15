@@ -12,7 +12,7 @@
     data () {
       return {
         openId: '',
-        loadFinish: true
+        loadFinish: false
       }
     },
     methods: {
@@ -21,22 +21,21 @@
           if (res.code === 200) {
             this.openId = res.data.openId;
             if (this.openId === '') {
-              console.log(res);
-              window.location.href = 'http://hbzkzpp.cn/wx/getOpenId'
+              window.location.href = 'http://hbzkzpp.cn/api/wx/getOpenId'
             } else {
               localStorage.setItem('openId', this.openId)
               this.loadFinish = true
             }
           } else {
-            window.location.href = 'http://hbzkzpp.cn/wx/getOpenId'
+            window.location.href = 'http://hbzkzpp.cn/api/wx/getOpenId'
           }
         }).catch(err => {
-          window.location.href = 'http://hbzkzpp.cn/wx/getOpenId'
+          window.location.href = 'http://hbzkzpp.cn/api/wx/getOpenId'
         })
       }
     },
     mounted () {
-      // this.getOpenId()
+      this.getOpenId()
     }
   }
 </script>
