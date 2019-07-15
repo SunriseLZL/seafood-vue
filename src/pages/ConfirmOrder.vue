@@ -3,7 +3,7 @@
     <mt-header title="确认订单" class="header">
       <!--      <mt-button @click="toShoppingCart" icon="back" slot="left">返回</mt-button>-->
     </mt-header>
-    <div class="addressFirm" v-if="addressList.length > 0">
+    <div class="addressFirm" @click="changeAdd" v-if="addressList.length > 0">
       <p class="name">收货人：{{addressInfo.name}}</p>
       <p class="phone">{{addressInfo.mobile}}</p>
       <p class="address">收货地址：{{addressInfo.address}}</p>
@@ -17,10 +17,10 @@
       <div class="right-content">
         <p class="good-name">{{good.title}}</p>
         <!--        <p class="good-remain">仅剩 500 斤</p>-->
-        <p class="good-price">批发价<span class="flag">￥</span>{{good.retailPrice}}<span class="discount">零售价￥{{good.wholesalePrice}}</span>
+        <p class="good-price">批发价<span class="flag">￥</span>{{good.wholesalePrice}}<span class="discount">零售价￥{{good.retailPrice}}</span>
         </p>
       </div>
-      <div class="buy">x1</div>
+      <div class="buy">x{{good.amount}}</div>
     </div>
     <div class="sendWay">
       <mt-field label="买家留言" placeholder="（选填）此处给商家留言" :disableClear="true" v-model="orderNote"></mt-field>
@@ -51,6 +51,7 @@
 <script>
   import api from '@/api/api';
   import {MessageBox, Toast} from 'mint-ui';
+
   export default {
     data() {
       return {
@@ -66,14 +67,14 @@
           mobile: '',
           address: ''
         }
-      }
+      };
     },
     computed: {
       totalPrice() {
         let total = 0;
         if (this.goodsList && this.goodsList.length > 0) {
           this.goodsList.forEach(item => {
-            console.log(item)
+            console.log(item);
             total += item.amount * item.retailPrice;
           });
         }
@@ -82,23 +83,37 @@
     },
     methods: {
       toAddAddress() {
-        this.$router.replace({path: '/addAddress'})
+        this.$router.replace({path: '/addAddress'});
       },
       toShoppingCart() {
-        this.$router.push({path: '/shoppingCart'})
+        this.$router.push({path: '/shoppingCart'});
+      },
+      changeAdd() {
+        this.$router.push({path: '/address', query: {change: 1}});
       },
       getAddress() {
-        api.post('/address/select', {"userId": localStorage.getItem('userId') || 'a9755b894fbb4cc59def8455d3902762'}).then(res => {
+        api.post('/address/select', {'userId': localStorage.getItem('userId') || 'a9755b894fbb4cc59def8455d3902762'}).then(res => {
           if (res.code === 200) {
             this.addressList = res.data;
-            this.addressInfo = {
-              id: this.addressList[0].id,
-              name: this.addressList[0].name,
-              mobile: this.addressList[0].mobile,
-              address: this.addressList[0].addressArea + this.addressList[0].addressDetail,
+            let addressId = this.$route.query.addressId;
+            if (addressId) {
+              let address = this.addressList.find(item => item.id === addressId);
+              this.addressInfo = {
+                id: address.id,
+                name: address.name,
+                mobile: address.mobile,
+                address: address.addressArea + address.addressDetail,
+              };
+            } else {
+              this.addressInfo = {
+                id: this.addressList[0].id,
+                name: this.addressList[0].name,
+                mobile: this.addressList[0].mobile,
+                address: this.addressList[0].addressArea + this.addressList[0].addressDetail,
+              };
             }
           }
-        })
+        });
       },
       addOrder() {
         if (!this.addressList.length) {
@@ -110,9 +125,9 @@
           userId: localStorage.getItem('userId') || 'a9755b894fbb4cc59def8455d3902762',
           goodsList: this.goodsList.map(item => {
             return {
-              "goodsId": item.id,
-              "goodsNum": item.amount
-            }
+              'goodsId': item.id,
+              'goodsNum': item.amount
+            };
           }),
           goodsTotal: this.totalPrice,
           orderNote: this.orderNote,
@@ -122,13 +137,13 @@
             this.orderId = res.data.orderId;
             this.wxPay();
           }
-        })
+        });
       },
       wxPay() {
         api.post('/wx/orderPay', {orderId: this.orderId, openId: this.openId}).then(res => {
           if (res.code === 200) {
             this.payObject = res.data;
-            if (typeof WeixinJSBridge == "undefined") {
+            if (typeof WeixinJSBridge == 'undefined') {
               if (document.addEventListener) {
                 document.addEventListener('WeixinJSBridgeReady', this.onBridgeReady, false);
               } else if (document.attachEvent) {
@@ -139,13 +154,13 @@
               this.onBridgeReady();
             }
           }
-        })
+        });
       },
       onBridgeReady() {
         WeixinJSBridge.invoke(
           'getBrandWCPayRequest', this.payObject,
           function (res) {
-            if (res.err_msg === "get_brand_wcpay_request:ok") {
+            if (res.err_msg === 'get_brand_wcpay_request:ok') {
               MessageBox('提示', '支付成功!');
             } else {
               MessageBox('提示', '支付失败!');
@@ -156,11 +171,11 @@
     },
     mounted() {
       this.goodsList = JSON.parse(localStorage.getItem('goodsList'));
-      console.log(this.goodsList)
+      console.log(this.goodsList);
       this.getAddress();
       this.openId = localStorage.getItem('openId');
     }
-  }
+  };
 </script>
 
 <style lang="scss" scoped="" rel="stylesheet/scss">

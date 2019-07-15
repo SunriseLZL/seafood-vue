@@ -5,7 +5,7 @@
     </mt-header>
     <div class="content">
       <div class="form">
-        <div class="section" v-for="item in addressList">
+        <div class="section" v-for="item in addressList" @click="selectAdd(item)">
           <div class="info">
             <p class="name">{{item.name}}</p>
             <p class="phone">{{item.mobile}}</p>
@@ -44,14 +44,14 @@
     data() {
       return {
         addressList: []
-      }
+      };
     },
     methods: {
       goBack() {
-        this.$router.go(-1)
+        this.$router.go(-1);
       },
       toRouter(path) {
-        this.$router.push({path})
+        this.$router.push({path});
       },
       del(id) {
         const vm = this;
@@ -71,32 +71,36 @@
             Toast({
               message: res.message
             });
-          })
+          });
         });
       },
       edit(item) {
-        this.$router.push({path: '/editAddress', query: {...item}})
+        this.$router.push({path: '/editAddress', query: {...item}});
       },
       add() {
-        this.$router.push({path: '/addAddress'})
+        this.$router.push({path: '/addAddress'});
+      },
+      selectAdd(item) {
+        console.log(item);
+        this.$router.push({path: '/confirmOrder', query: {addressId: item.id}});
       },
       init() {
-        api.post('/address/select', {"userId": localStorage.getItem('userId') || 'a9755b894fbb4cc59def8455d3902762'}).then(res => {
+        api.post('/address/select', {'userId': localStorage.getItem('userId') || 'a9755b894fbb4cc59def8455d3902762'}).then(res => {
           if (res.code === 200) {
             this.addressList = res.data;
             console.log(this.addressList);
           } else {
-            this.$Message.error(res.message)
+            this.$Message.error(res.message);
           }
         }).catch(err => {
-          this.$Message.error(err)
-        })
+          this.$Message.error(err);
+        });
       }
     },
     mounted() {
-      this.init()
+      this.init();
     }
-  }
+  };
 </script>
 
 <style lang="scss" scoped="" rel="stylesheet/scss">

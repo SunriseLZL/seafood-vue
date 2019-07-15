@@ -18,7 +18,7 @@
             <div class="right-content">
               <p class="good-name">{{item.title}}</p>
               <!--              <p class="good-remain">仅剩 500 斤</p>-->
-              <p class="good-price">批发价<span class="flag">￥</span>{{item.goodsRetailPrice}}<span class="discount">零售价￥{{item.goodsWholesalePrice}}</span>
+              <p class="good-price">批发价<span class="flag">￥</span>{{item.goodsWholesalePrice}}<span class="discount">零售价￥{{item.goodsRetailPrice}}</span>
               </p>
             </div>
             <div class="buy">x{{item.goodsBuyNum}}</div>
@@ -37,7 +37,7 @@
             <div class="right-content">
               <p class="good-name">{{item.title}}</p>
               <!--              <p class="good-remain">仅剩 500 斤</p>-->
-              <p class="good-price">批发价<span class="flag">￥</span>{{item.goodsRetailPrice}}<span class="discount">零售价￥{{item.goodsWholesalePrice}}</span>
+              <p class="good-price">批发价<span class="flag">￥</span>{{item.goodsWholesalePrice}}<span class="discount">零售价￥{{item.goodsRetailPrice}}</span>
               </p>
             </div>
             <div class="buy">x{{item.goodsBuyNum}}</div>
@@ -56,7 +56,7 @@
             <div class="right-content">
               <p class="good-name">{{item.title}}</p>
               <!--              <p class="good-remain">仅剩 500 斤</p>-->
-              <p class="good-price">批发价<span class="flag">￥</span>{{item.goodsRetailPrice}}<span class="discount">零售价￥{{item.goodsWholesalePrice}}</span>
+              <p class="good-price">批发价<span class="flag">￥</span>{{item.goodsWholesalePrice}}<span class="discount">零售价￥{{item.goodsRetailPrice}}</span>
               </p>
             </div>
             <div class="buy">x{{item.goodsBuyNum}}</div>
