@@ -17,8 +17,8 @@
       <div class="right-content">
         <p class="good-name">{{good.title}}</p>
         <!--        <p class="good-remain">仅剩 500 斤</p>-->
-        <p class="good-price">批发价<span class="flag">￥</span>{{good.wholesalePrice}}<span class="discount">零售价￥{{good.retailPrice}}</span>
-        </p>
+        <p class="good-price" v-if="good.amount >=30">批发<span class="flag">￥</span>{{good.wholesalePrice}}元/{{unitDict[good.unit]}}</p>
+        <p class="good-price" v-else>零售<span class="flag">￥</span>{{good.retailPrice}}元/{{unitDict[good.unit]}}</p>
       </div>
       <div class="buy">x{{good.amount}}</div>
     </div>
@@ -66,6 +66,12 @@
           name: '',
           mobile: '',
           address: ''
+        },
+        unitDict: {
+          '1': '斤',
+          '2': '袋',
+          '3': '只',
+          '4': '桶',
         }
       }
     },
@@ -230,14 +236,13 @@
         color: #DE2D2E;
 
         .flag {
-          font-size: px2rem(24px);
+          font-size: px2rem(16px);
         }
 
         .discount {
           margin-left: px2rem(5px);
           font-size: px2rem(24px);
           color: #A4A4A4;
-          text-decoration: line-through;
         }
       }
     }

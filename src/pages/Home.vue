@@ -18,7 +18,8 @@
         <div class="right-content" @click="toRouter('/buy',{id:item.id})">
           <p class="good-name">{{item.title}}</p>
           <p class="good-remain">仅剩 {{item.num}}{{unitDict[item.unit]}}</p>
-          <p class="good-price">零售：<span class="flag">￥</span>{{item.retailPrice}}<span class="discount">&nbsp;&nbsp;批发：￥{{item.wholesalePrice}}</span>
+          <p class="good-price">零售：<span class="flag">￥</span>{{item.retailPrice}}元/{{unitDict[item.unit]}}<span class="discount">
+            &nbsp;&nbsp;批发：<span class="flag">￥</span>{{item.wholesalePrice}}元/{{unitDict[item.unit]}}</span>
           </p>
         </div>
         <div class="buy">
@@ -203,7 +204,7 @@
       white-space: nowrap;
 
       .flag {
-        font-size: px2rem(24px);
+        font-size: px2rem(12px);
       }
 
       .discount {

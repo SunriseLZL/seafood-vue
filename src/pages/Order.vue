@@ -17,9 +17,8 @@
             <img :src="item.photo" class="picture">
             <div class="right-content">
               <p class="good-name">{{item.title}}</p>
-              <!--              <p class="good-remain">仅剩 500 斤</p>-->
-              <p class="good-price">批发价<span class="flag">￥</span>{{item.goodsWholesalePrice}}<span class="discount">零售价￥{{item.goodsRetailPrice}}</span>
-              </p>
+              <p class="good-price" v-if="item.goodsBuyNum >=30">批发<span class="flag">￥</span>{{item.goodsWholesalePrice}}元/{{unitDict[item.unit]}}</p>
+              <p class="good-price" v-else>零售<span class="flag">￥</span>{{item.goodsRetailPrice}}元/{{unitDict[item.unit]}}</p>
             </div>
             <div class="buy">x{{item.goodsBuyNum}}</div>
           </div>
@@ -37,8 +36,8 @@
             <div class="right-content">
               <p class="good-name">{{item.title}}</p>
               <!--              <p class="good-remain">仅剩 500 斤</p>-->
-              <p class="good-price">批发价<span class="flag">￥</span>{{item.goodsWholesalePrice}}<span class="discount">零售价￥{{item.goodsRetailPrice}}</span>
-              </p>
+              <p class="good-price" v-if="item.goodsBuyNum >=30">批发<span class="flag">￥</span>{{item.goodsWholesalePrice}}元/{{unitDict[item.unit]}}</p>
+              <p class="good-price" v-else>零售<span class="flag">￥</span>{{item.goodsRetailPrice}}元/{{unitDict[item.unit]}}</p>
             </div>
             <div class="buy">x{{item.goodsBuyNum}}</div>
           </div>
@@ -55,9 +54,8 @@
             <img :src="item.photo" class="picture">
             <div class="right-content">
               <p class="good-name">{{item.title}}</p>
-              <!--              <p class="good-remain">仅剩 500 斤</p>-->
-              <p class="good-price">批发价<span class="flag">￥</span>{{item.goodsWholesalePrice}}<span class="discount">零售价￥{{item.goodsRetailPrice}}</span>
-              </p>
+              <p class="good-price" v-if="item.goodsBuyNum >=30">批发<span class="flag">￥</span>{{item.goodsWholesalePrice}}元/{{unitDict[item.unit]}}</p>
+              <p class="good-price" v-else>零售<span class="flag">￥</span>{{item.goodsRetailPrice}}元/{{unitDict[item.unit]}}</p>
             </div>
             <div class="buy">x{{item.goodsBuyNum}}</div>
           </div>
@@ -78,13 +76,19 @@
         openId: '',
         orderId: '',
         payObject: {},
-        orderList: []
+        orderList: [],
+        unitDict: {
+          '1': '斤',
+          '2': '袋',
+          '3': '只',
+          '4': '桶',
+        }
       }
     },
     methods: {
       getOrder() {
         Indicator.open();
-        api.post('/order/select', {"userId": localStorage.getItem('userId')}).then((res) => {
+        api.post('/order/select', {"userId": 'a9755b894fbb4cc59def8455d3902762' || localStorage.getItem('userId')}).then((res) => {
           console.log(res);
           this.orderList = res.data.orderList;
           Indicator.close();
@@ -212,7 +216,7 @@
       white-space: nowrap;
 
       .flag {
-        font-size: px2rem(24px);
+        font-size: px2rem(16px);
       }
 
       .discount {

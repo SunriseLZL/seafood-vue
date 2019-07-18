@@ -15,8 +15,9 @@
         <img :src="good.photo" class="picture" @click="getIndex(index)">
         <div class="right-content">
           <p class="good-name">{{good.title}}</p>
-          <p class="good-remain">仅剩 {{good.num}} {{unitDict[good.unit]}}</p>
-          <p class="good-price">零售<span class="flag">￥</span>{{good.retailPrice}}<span class="discount">批发￥{{good.wholesalePrice}}</span>
+          <p class="good-remain">仅剩 {{good.num}}{{unitDict[good.unit]}}</p>
+          <p class="good-price">零售<span class="flag">￥</span>{{good.retailPrice}}元/{{unitDict[good.unit]}}
+            <span class="discount">批发<span class="flag">￥</span>{{good.wholesalePrice}}元/{{unitDict[good.unit]}}</span>
           </p>
         </div>
         <div class="buy">
@@ -277,7 +278,6 @@
       margin-left: px2rem(5px);
       font-size: px2rem(20px);
       color: #A4A4A4;
-      text-decoration: line-through;
     }
   }
 
