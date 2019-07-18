@@ -15,7 +15,7 @@
         <img :src="good.photo" class="picture" @click="getIndex(index)">
         <div class="right-content">
           <p class="good-name">{{good.title}}</p>
-          <p class="good-remain">仅剩 {{good.num}} 斤</p>
+          <p class="good-remain">仅剩 {{good.num}} {{good.unit}}</p>
           <p class="good-price">零售<span class="flag">￥</span>{{good.retailPrice}}<span class="discount">批发￥{{good.wholesalePrice}}</span>
           </p>
         </div>
@@ -82,7 +82,7 @@
         }
         this.goodsList.forEach(item => {
           if (item.select) {
-            if (item.amount >= 3) {
+            if (item.amount >= 30) {
               total += item.wholesalePrice * item.amount;
             } else {
               total += item.retailPrice * item.amount;

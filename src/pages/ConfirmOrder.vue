@@ -74,7 +74,7 @@
         let total = 0;
         if (this.goodsList && this.goodsList.length > 0) {
           this.goodsList.forEach(item => {
-            if (item.amount >= 3) {
+            if (item.amount >= 30) {
               total += item.wholesalePrice * item.amount;
             } else {
               total += item.retailPrice * item.amount;
@@ -95,7 +95,7 @@
         this.$router.push({path: '/address', query: {change: 1}});
       },
       getAddress() {
-        api.post('/address/select', {'userId': localStorage.getItem('userId') || 'a9755b894fbb4cc59def8455d3902762'}).then(res => {
+        api.post('/address/select', {'userId': localStorage.getItem('userId')}).then(res => {
           if (res.code === 200) {
             this.addressList = res.data;
             let addressId = this.$route.query.addressId;
@@ -125,7 +125,7 @@
         }
         // 添加订单获取订单id后支付
         api.post('/order/add', {
-          userId: localStorage.getItem('userId') || 'a9755b894fbb4cc59def8455d3902762',
+          userId: localStorage.getItem('userId'),
           goodsList: this.goodsList.map(item => {
             return {
               'goodsId': item.id,

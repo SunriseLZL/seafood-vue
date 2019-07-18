@@ -7,7 +7,7 @@
     <div class="shopDetail">
       <p class="title">{{goodDetail.title}}</p>
       <p class="area">产地：{{goodDetail.address}}</p>
-      <p class="area">库存：{{goodDetail.num}}斤</p>
+      <p class="area">库存：{{goodDetail.num}}{{goodDetail.unit}}</p>
       <p class="good-price">零售<span class="flag">￥</span>{{goodDetail.retailPrice}}<span class="discount">批发￥{{goodDetail.wholesalePrice}}</span>
       </p>
       <div class="area">

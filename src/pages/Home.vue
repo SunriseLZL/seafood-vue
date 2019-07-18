@@ -17,7 +17,7 @@
         </div>
         <div class="right-content" @click="toRouter('/buy',{id:item.id})">
           <p class="good-name">{{item.title}}</p>
-          <p class="good-remain">仅剩 {{item.num}}斤</p>
+          <p class="good-remain">仅剩 {{item.num}}{{item.unit}}</p>
           <p class="good-price">零售：<span class="flag">￥</span>{{item.retailPrice}}<span class="discount">&nbsp;&nbsp;批发：￥{{item.wholesalePrice}}</span>
           </p>
         </div>

@@ -85,7 +85,7 @@
         this.$router.push({path: '/confirmOrder', query: {addressId: item.id}});
       },
       init() {
-        api.post('/address/select', {'userId': localStorage.getItem('userId') || 'a9755b894fbb4cc59def8455d3902762'}).then(res => {
+        api.post('/address/select', {'userId': localStorage.getItem('userId')}).then(res => {
           if (res.code === 200) {
             this.addressList = res.data;
             console.log(this.addressList);

@@ -56,7 +56,7 @@
         api.post('/address/add', {
           name: vm.name,
           mobile: vm.mobile,
-          userId: localStorage.getItem('userId') || 'a9755b894fbb4cc59def8455d3902762',
+          userId: localStorage.getItem('userId'),
           addressArea: vm.addressArea.join(),
           addressDetail: vm.addressDetail
         }).then(res => {

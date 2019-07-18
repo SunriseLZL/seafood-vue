@@ -84,7 +84,7 @@
     methods: {
       getOrder() {
         Indicator.open();
-        api.post('/order/select', {"userId": localStorage.getItem('userId') || 'a9755b894fbb4cc59def8455d3902762'}).then((res) => {
+        api.post('/order/select', {"userId": localStorage.getItem('userId')}).then((res) => {
           console.log(res);
           this.orderList = res.data.orderList;
           Indicator.close();
