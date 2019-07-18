@@ -8,7 +8,7 @@
       <p class="title">{{goodDetail.title}}</p>
       <p class="area">产地：{{goodDetail.address}}</p>
       <p class="area">库存：{{goodDetail.num}}斤</p>
-      <p class="good-price">批发价<span class="flag">￥</span>{{goodDetail.wholesalePrice}}<span class="discount">零售价￥{{goodDetail.retailPrice}}</span>
+      <p class="good-price">零售<span class="flag">￥</span>{{goodDetail.retailPrice}}<span class="discount">批发￥{{goodDetail.wholesalePrice}}</span>
       </p>
       <div class="area">
         <span class="amount">选择数量：</span>
@@ -94,7 +94,6 @@
       margin-left: px2rem(15px);
       font-size: px2rem(32px);
       color: #A4A4A4;
-      text-decoration: line-through;
     }
   }
 

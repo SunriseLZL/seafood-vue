@@ -16,7 +16,7 @@
         <div class="right-content">
           <p class="good-name">{{good.title}}</p>
           <p class="good-remain">仅剩 {{good.num}} 斤</p>
-          <p class="good-price">批发价<span class="flag">￥</span>{{good.wholesalePrice}}<span class="discount">零售价￥{{good.retailPrice}}</span>
+          <p class="good-price">零售<span class="flag">￥</span>{{good.retailPrice}}<span class="discount">批发￥{{good.wholesalePrice}}</span>
           </p>
         </div>
         <div class="buy">
@@ -50,134 +50,136 @@
 </template>
 
 <script>
-  import api from '@/api/api'
-  import {MessageBox, Toast} from 'mint-ui'
+  import api from '@/api/api';
+  import {MessageBox, Toast} from 'mint-ui';
 
   export default {
-    data () {
+    data() {
       return {
         food_count: 10,
         selectCount: 0,
         editAble: false,
         goodsList: []
-      }
+      };
     },
     computed: {
-      all () {
+      all() {
         for (let i = 0; i < this.goodsList.length; i++) {
           if (!this.goodsList[i].select) {
-            return false
+            return false;
           }
         }
-        return true
+        return true;
       },
-      totalCount () {
-        return this.goodsList.length
+      totalCount() {
+        return this.goodsList.length;
       },
-      totalPrice () {
-        let total = 0
-        let amount = this.goodsList.length
-        if (amount > 10) {
-          this.goodsList.forEach(item => {
-            if (item.select) {
-              total += item.wholesalePrice * item.amount
-            }
-          })
-          return total
-        } else {
-          this.goodsList.forEach(item => {
-            if (item.select) {
-              total += item.retailPrice * item.amount
-            }
-          })
-          return total
+      totalPrice() {
+        let total = 0;
+        let amount = this.goodsList.length;
+        if (!amount) {
+          return 0;
         }
-
+        this.goodsList.forEach(item => {
+          if (item.select) {
+            if (item.amount >= 3) {
+              total += item.wholesalePrice * item.amount;
+            } else {
+              total += item.retailPrice * item.amount;
+            }
+          }
+        });
+        return total;
       }
     },
     methods: {
-      toShoppingCart () {
-        this.$router.push({path: '/shoppingCart'})
+      toShoppingCart() {
+        this.$router.push({path: '/shoppingCart'});
       },
-      getIndex (index) {
-        console.log(index)
+      getIndex(index) {
+        console.log(index);
       },
-      addAmount (id) {
+      addAmount(id) {
         this.goodsList.map((item, index) => {
-          console.log(item, id)
+          console.log(item, id);
           if (item.id === id) {
             this.$set(this.goodsList, index, {
               ...this.goodsList[index],
               amount: this.goodsList[index].amount + 1
-            })
+            });
           }
-        })
+        });
       },
-      delAmount (id) {
+      delAmount(id) {
         this.goodsList.map((item, index) => {
           if (item.id === id) {
             if (this.goodsList[index].amount > 0) {
               this.$set(this.goodsList, index, {
                 ...this.goodsList[index],
                 amount: this.goodsList[index].amount - 1
-              })
+              });
             }
           }
-        })
+        });
       },
-      submitOrder () {
-        let count = 0
-        const goodsList = []
+      submitOrder() {
+        let count = 0;
+        const goodsList = [];
         this.goodsList.map(item => {
-          console.log(item)
+          console.log(item);
           if (item.select) {
-            count++
+            count++;
             goodsList.push({
               ...item
-            })
+            });
           }
-        })
-        this.selectCount = count
+        });
+        this.selectCount = count;
+        if (!this.totalPrice) {
+          MessageBox.alert('购物车内商品数量为空', '提示');
+          return false;
+        }
         if (this.selectCount > 0) {
-          localStorage.setItem('goodsList', JSON.stringify(goodsList))
-          this.$router.push({path: '/confirmOrder'})
+          localStorage.setItem('goodsList', JSON.stringify(goodsList));
+          this.$router.push({path: '/confirmOrder'});
         } else {
-          MessageBox.alert('您还未选择商品哦~', '提示')
+          MessageBox.alert('您还未选择商品哦', '提示');
+          return false;
         }
       },
-      choose (id) {
+      choose(id) {
         this.goodsList.map((item, index) => {
           if (item.id === id) {
             this.$set(this.goodsList, index, {
               ...this.goodsList[index],
               select: !this.goodsList[index].select
-            })
+            });
           }
-        })
+        });
       },
-      pickAll () {
+      pickAll() {
         if (this.all) {
           this.goodsList.map((item, index) => {
             this.$set(this.goodsList, index, {
               ...this.goodsList[index],
               select: false
-            })
-          })
+            });
+          });
         } else {
           this.goodsList.map((item, index) => {
             this.$set(this.goodsList, index, {
               ...this.goodsList[index],
               select: true
-            })
-          })
+            });
+          });
         }
       },
     },
-    mounted () {
-      this.goodsList = JSON.parse(localStorage.getItem('goodsList'))
-      console.log(this.goodsList)
+    mounted() {
+      this.goodsList = JSON.parse(localStorage.getItem('goodsList'));
+      console.log(this.goodsList);
     }
-  }
+  };
 </script>
 
 <style lang="scss" scoped="" rel="stylesheet/scss">

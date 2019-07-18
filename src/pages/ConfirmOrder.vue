@@ -1,7 +1,7 @@
 <template>
   <div>
     <mt-header title="确认订单" class="header">
-      <!--      <mt-button @click="toShoppingCart" icon="back" slot="left">返回</mt-button>-->
+      <mt-button @click="toShoppingCart" icon="back" slot="left">返回</mt-button>
     </mt-header>
     <div class="addressFirm" @click="changeAdd" v-if="addressList.length > 0">
       <p class="name">收货人：{{addressInfo.name}}</p>
@@ -74,8 +74,11 @@
         let total = 0;
         if (this.goodsList && this.goodsList.length > 0) {
           this.goodsList.forEach(item => {
-            console.log(item);
-            total += item.amount * item.retailPrice;
+            if (item.amount >= 3) {
+              total += item.wholesalePrice * item.amount;
+            } else {
+              total += item.retailPrice * item.amount;
+            }
           });
         }
         return total;

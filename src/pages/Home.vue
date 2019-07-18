@@ -4,12 +4,13 @@
       <mt-swipe :auto="4000">
         <mt-swipe-item v-for="item in banners" :key="item.id">
           <div class="img-wrap">
-            <img :src="item.photo">
+            <img :src="item.photo" @click="toRouter('/buy',{id:item.id})">
           </div>
         </mt-swipe-item>
       </mt-swipe>
     </div>
     <div class="goods-list">
+      <p class="tip">注：单品满30斤即可享受批发价</p>
       <div class="row" v-for="item in goodsList">
         <div class="picture" @click="toRouter('/buy',{id:item.id})">
           <img v-lazy="item.photo">
@@ -17,7 +18,7 @@
         <div class="right-content" @click="toRouter('/buy',{id:item.id})">
           <p class="good-name">{{item.title}}</p>
           <p class="good-remain">仅剩 {{item.num}}斤</p>
-          <p class="good-price">批发价<span class="flag">￥</span>{{item.wholesalePrice}}<span class="discount">零售价￥{{item.retailPrice}}</span>
+          <p class="good-price">零售：<span class="flag">￥</span>{{item.retailPrice}}<span class="discount">&nbsp;&nbsp;批发：￥{{item.wholesalePrice}}</span>
           </p>
         </div>
         <div class="buy">
@@ -66,7 +67,7 @@
             params.push(item);
           }
         });
-        localStorage.setItem('goodsList',JSON.stringify(params));
+        localStorage.setItem('goodsList', JSON.stringify(params));
         this.$router.push({path: '/shoppingCart'});
       },
       addAmount(id) {
@@ -104,10 +105,10 @@
           console.log(error);
         });
       },
-      aaa(){
+      aaa() {
         api.post('/user/getOpenId').then(res => {
-          console.log(res)
-        })
+          console.log(res);
+        });
       }
     },
     mounted() {
@@ -123,6 +124,12 @@
   .swipe-box {
     width: 100%;
     height: px2rem(300px);
+  }
+
+  .tip {
+    text-indent: px2rem(20px);
+    margin-top: px2rem(10px);
+    color: #DE2D2E;
   }
 
   .goods-list {
@@ -197,11 +204,9 @@
         margin-left: px2rem(5px);
         font-size: px2rem(20px);
         color: #A4A4A4;
-        text-decoration: line-through;
       }
     }
   }
-
 
   .core-buy {
     width: 100%;
