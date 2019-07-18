@@ -81,7 +81,7 @@
             }
           });
         }
-        return total;
+        return total.toFixed(2);
       }
     },
     methods: {

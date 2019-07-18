@@ -12,7 +12,7 @@
     data() {
       return {
         openId: '',
-        loadFinish: true
+        loadFinish: false
       };
     },
     methods: {
@@ -35,7 +35,7 @@
       }
     },
     mounted() {
-      // this.getOpenId();
+      this.getOpenId();
     }
   };
 </script>

@@ -15,7 +15,7 @@
         <img :src="good.photo" class="picture" @click="getIndex(index)">
         <div class="right-content">
           <p class="good-name">{{good.title}}</p>
-          <p class="good-remain">仅剩 {{good.num}} {{good.unit}}</p>
+          <p class="good-remain">仅剩 {{good.num}} {{unitDict[good.unit]}}</p>
           <p class="good-price">零售<span class="flag">￥</span>{{good.retailPrice}}<span class="discount">批发￥{{good.wholesalePrice}}</span>
           </p>
         </div>
@@ -59,7 +59,13 @@
         food_count: 10,
         selectCount: 0,
         editAble: false,
-        goodsList: []
+        goodsList: [],
+        unitDict: {
+          '1': '斤',
+          '2': '袋',
+          '3': '只',
+          '4': '桶',
+        }
       };
     },
     computed: {
@@ -89,7 +95,7 @@
             }
           }
         });
-        return total;
+        return total.toFixed(2);
       }
     },
     methods: {
@@ -314,12 +320,13 @@
 
   .goods-list {
     min-height: px2rem(800px);
+    margin-bottom: px2rem(170px);
   }
 
   .selection {
     position: fixed;
     right: 0;
-    bottom: px2rem(110px);
+    bottom: px2rem(80px);
     width: 100%;
     height: px2rem(80px);
     background: #FFFFFF;

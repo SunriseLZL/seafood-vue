@@ -7,7 +7,7 @@
     <div class="shopDetail">
       <p class="title">{{goodDetail.title}}</p>
       <p class="area">产地：{{goodDetail.address}}</p>
-      <p class="area">库存：{{goodDetail.num}}{{goodDetail.unit}}</p>
+      <p class="area">库存：{{goodDetail.num}}{{unitDict[goodDetail.unit]}}</p>
       <p class="good-price">零售<span class="flag">￥</span>{{goodDetail.retailPrice}}<span class="discount">批发￥{{goodDetail.wholesalePrice}}</span>
       </p>
       <div class="area">
@@ -28,12 +28,19 @@
 
 <script>
   import api from '@/api/api';
-  import { MessageBox } from 'mint-ui';
+  import {MessageBox} from 'mint-ui';
+
   export default {
     data() {
       return {
         goodDetail: {},
-        amount: 0
+        amount: 0,
+        unitDict: {
+          '1': '斤',
+          '2': '袋',
+          '3': '只',
+          '4': '桶',
+        }
       };
     },
     methods: {
@@ -59,10 +66,10 @@
       toBuy() {
         if (!this.amount) {
           MessageBox('提示', '选择数量不能为空');
-          return false
+          return false;
         }
-        localStorage.setItem('goodsList',JSON.stringify([{...this.goodDetail, amount: this.amount}]));
-        this.$router.replace({path: '/confirmOrder'})
+        localStorage.setItem('goodsList', JSON.stringify([{...this.goodDetail, amount: this.amount}]));
+        this.$router.replace({path: '/confirmOrder'});
       }
     },
     mounted() {
