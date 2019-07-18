@@ -17,7 +17,7 @@
       <div class="right-content">
         <p class="good-name">{{good.title}}</p>
         <!--        <p class="good-remain">仅剩 500 斤</p>-->
-        <p class="good-price">批发价<span class="flag">￥</span>{{good.retailPrice}}<span class="discount">零售价￥{{good.wholesalePrice}}</span>
+        <p class="good-price">批发价<span class="flag">￥</span>{{good.wholesalePrice}}<span class="discount">零售价￥{{good.retailPrice}}</span>
         </p>
       </div>
       <div class="buy">x1</div>

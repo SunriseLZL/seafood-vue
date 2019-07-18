@@ -46,6 +46,7 @@
 <script>
   import api from '@/api/api';
   import {MessageBox, Toast} from 'mint-ui';
+
   export default {
     data() {
       return {
@@ -53,7 +54,7 @@
         selectCount: 0,
         editAble: false,
         goodsList: []
-      }
+      };
     },
     computed: {
       all() {
@@ -62,33 +63,44 @@
             return false;
           }
         }
-        return true
+        return true;
       },
       totalCount() {
-        return this.goodsList.length
+        return this.goodsList.length;
       },
       totalPrice() {
         let total = 0;
-        this.goodsList.forEach(item => {
-          if (item.select) {
-            total += item.wholesalePrice * item.amount
-          }
-        });
-        return total;
+        let amount = this.goodsList.length;
+        if (amount > 10) {
+          this.goodsList.forEach(item => {
+            if (item.select) {
+              total += item.wholesalePrice * item.amount;
+            }
+          });
+          return total;
+        } else {
+          this.goodsList.forEach(item => {
+            if (item.select) {
+              total += item.retailPrice * item.amount;
+            }
+          });
+          return total;
+        }
+
       }
     },
     methods: {
       toShoppingCart() {
-        this.$router.push({path: '/shoppingCart'})
+        this.$router.push({path: '/shoppingCart'});
       },
       getIndex(index) {
-        console.log(index)
+        console.log(index);
       },
       submitOrder() {
         let count = 0;
         const goodsList = [];
         this.goodsList.map(item => {
-          console.log(item)
+          console.log(item);
           if (item.select) {
             count++;
             goodsList.push({
@@ -98,8 +110,8 @@
         });
         this.selectCount = count;
         if (this.selectCount > 0) {
-          localStorage.setItem('goodsList',JSON.stringify(goodsList));
-          this.$router.push({path: '/confirmOrder'})
+          localStorage.setItem('goodsList', JSON.stringify(goodsList));
+          this.$router.push({path: '/confirmOrder'});
         } else {
           MessageBox.alert('您还未选择商品哦~', '提示');
         }
@@ -110,9 +122,9 @@
             this.$set(this.goodsList, index, {
               ...this.goodsList[index],
               select: !this.goodsList[index].select
-            })
+            });
           }
-        })
+        });
       },
       pickAll() {
         if (this.all) {
@@ -120,23 +132,23 @@
             this.$set(this.goodsList, index, {
               ...this.goodsList[index],
               select: false
-            })
-          })
+            });
+          });
         } else {
           this.goodsList.map((item, index) => {
             this.$set(this.goodsList, index, {
               ...this.goodsList[index],
               select: true
-            })
-          })
+            });
+          });
         }
       },
     },
     mounted() {
       this.goodsList = JSON.parse(localStorage.getItem('goodsList'));
-      console.log(this.goodsList)
+      console.log(this.goodsList);
     }
-  }
+  };
 </script>
 
 <style lang="scss" scoped="" rel="stylesheet/scss">
