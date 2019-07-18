@@ -6,7 +6,6 @@
 
 <script>
   import api from '@/api/api';
-  import {MessageBox} from 'mint-ui';
 
   export default {
     data() {

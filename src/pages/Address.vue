@@ -5,8 +5,8 @@
     </mt-header>
     <div class="content">
       <div class="form">
-        <div class="section" v-for="item in addressList" @click="selectAdd(item)">
-          <div class="info">
+        <div class="section" v-for="item in addressList">
+          <div class="info" @click.stop="selectAdd(item)">
             <p class="name">{{item.name}}</p>
             <p class="phone">{{item.mobile}}</p>
             <p class="realAdd">
@@ -15,13 +15,13 @@
           </div>
           <div class="btnGroup">
             <div class="edit">
-              <div class="wrap" @click="edit(item)">
+              <div class="wrap" @click.stop="edit(item)">
                 <img src="../../static/images/edit_icon.png" class="pic">
                 <span class="font">编辑</span>
               </div>
             </div>
             <div class="edit">
-              <div class="wrap" @click="del(item.id)">
+              <div class="wrap" @click.stop="del(item.id)">
                 <img src="../../static/images/delete_icon.png" class="pic">
                 <span class="font">删除</span>
               </div>
@@ -37,70 +37,71 @@
 </template>
 
 <script>
-  import api from '@/api/api';
-  import {MessageBox, Toast} from 'mint-ui';
+  import api from '@/api/api'
+  import {MessageBox, Toast} from 'mint-ui'
 
   export default {
-    data() {
+    data () {
       return {
         addressList: []
-      };
+      }
     },
     methods: {
-      goBack() {
-        this.$router.go(-1);
+      goBack () {
+        this.$router.go(-1)
       },
-      toRouter(path) {
-        this.$router.push({path});
+      toRouter (path) {
+        this.$router.push({path})
       },
-      del(id) {
-        const vm = this;
+      del (id) {
+        const vm = this
         MessageBox.confirm('确定要删除吗?').then(action => {
           api.post('/address/delete', {id: id}).then(res => {
             if (res.code === 200) {
               Toast({
                 message: '删除成功'
-              });
-              vm.init();
+              })
+              vm.init()
             } else {
               Toast({
                 message: res.message
-              });
+              })
             }
           }).catch(err => {
             Toast({
               message: res.message
-            });
-          });
-        });
+            })
+          })
+        })
       },
-      edit(item) {
-        this.$router.push({path: '/editAddress', query: {...item}});
+      edit (item) {
+        this.$router.push({path: '/editAddress', query: {...item}})
       },
-      add() {
-        this.$router.push({path: '/addAddress'});
+      add () {
+        this.$router.push({path: '/addAddress'})
       },
-      selectAdd(item) {
-        console.log(item);
-        this.$router.push({path: '/confirmOrder', query: {addressId: item.id}});
+      selectAdd (item) {
+        if (this.$route.query.change) {
+          this.$router.push({path: '/confirmOrder', query: {addressId: item.id}})
+        }
       },
-      init() {
+      init () {
         api.post('/address/select', {'userId': localStorage.getItem('userId')}).then(res => {
           if (res.code === 200) {
-            this.addressList = res.data;
-            console.log(this.addressList);
+            this.addressList = res.data
+            console.log(this.addressList)
           } else {
-            this.$Message.error(res.message);
+            this.$Message.error(res.message)
           }
         }).catch(err => {
-          this.$Message.error(err);
-        });
+          this.$Message.error(err)
+        })
       }
     },
-    mounted() {
-      this.init();
+    mounted () {
+      this.init()
     }
-  };
+  }
 </script>
 
 <style lang="scss" scoped="" rel="stylesheet/scss">

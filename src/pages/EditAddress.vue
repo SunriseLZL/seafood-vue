@@ -32,24 +32,25 @@
 
 <script>
   import api from '@/api/api'
-  import {MessageBox, Toast} from 'mint-ui';
+  import {MessageBox, Toast} from 'mint-ui'
+
   export default {
-    data() {
+    data () {
       return {
         id: '',
         name: '',
         mobile: '',
         addressDetail: '',
         addressArea: [],
-        cityData :[]
+        cityData: []
       }
     },
     methods: {
-      goBack() {
+      goBack () {
         this.$router.go(-1)
       },
-      addAddress() {
-        const vm = this;
+      addAddress () {
+        const vm = this
         api.post('/address/update', {
           name: vm.name,
           mobile: vm.mobile,
@@ -60,8 +61,8 @@
           if (res.code === 200) {
             Toast({
               message: '修改成功'
-            });
-            vm.$router.push({path: '/address'})
+            })
+            vm.$router.replace({path: '/address'})
           } else {
 
           }
@@ -70,21 +71,21 @@
         })
       }
     },
-    mounted() {
-      this.id = this.$route.query.id;
-      this.name = this.$route.query.name;
-      this.mobile = this.$route.query.mobile;
-      this.addressArea = this.$route.query.addressArea.split(',');
-      this.addressDetail = this.$route.query.addressDetail;
+    mounted () {
+      this.id = this.$route.query.id
+      this.name = this.$route.query.name
+      this.mobile = this.$route.query.mobile
+      this.addressArea = this.$route.query.addressArea.split(',')
+      this.addressDetail = this.$route.query.addressDetail
 
-      const vm = this;
-      $("#city-picker").cityPicker({
-        title: "选择省市区/县",
+      const vm = this
+      $('#city-picker').cityPicker({
+        title: '选择省市区/县',
         onChange: function (picker, values, displayValues) {
-          console.log(values, displayValues);
-          vm.addressArea = displayValues;
+          console.log(values, displayValues)
+          vm.addressArea = displayValues
         }
-      });
+      })
     }
   }
 </script>
@@ -101,13 +102,16 @@
     margin-top: px2rem(88px);
     background-color: #f2f2f2;
     overflow: hidden;
+
     .form {
       width: 100%;
       overflow: hidden;
       background-color: #ffffff;
       padding: 0 px2rem(24px);
+
       .phone {
         min-height: px2rem(96px);
+
         .label {
           float: left;
           width: px2rem(132px);
@@ -115,6 +119,7 @@
           font-size: px2rem(30px);
           color: #3F3F3F;
         }
+
         .input {
           float: left;
           width: px2rem(380px);
@@ -125,9 +130,11 @@
           margin-left: px2rem(30px);
           border: none;
         }
+
         .input:focus, .code:focus {
           outline: none;
         }
+
         .code {
           float: right;
           width: px2rem(160px);
@@ -140,6 +147,7 @@
           border-radius: 100px;
           padding: 0 px2rem(15px);
         }
+
         .address {
           float: left;
           margin-left: px2rem(24px);
@@ -148,13 +156,16 @@
           border: none;
           resize: none;
         }
+
         .address:focus {
           outline: none;
         }
       }
+
       .phone.bottom {
         height: px2rem(96px);
         border-bottom: px2rem(1px) solid #DFDFDF;
+
         .select {
           width: px2rem(400px);
           margin-top: px2rem(14px);
@@ -163,6 +174,7 @@
         }
       }
     }
+
     .btn {
       position: absolute;
       bottom: px2rem(20px);

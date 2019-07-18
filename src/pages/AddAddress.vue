@@ -31,8 +31,9 @@
 </template>
 
 <script>
-  import api from '@/api/api';
-  import { Toast  } from 'mint-ui';
+  import api from '@/api/api'
+  import {Toast} from 'mint-ui'
+
   export default {
     data () {
       return {
@@ -51,8 +52,8 @@
       toRouter (path) {
         this.$router.push({path})
       },
-      addAddress() {
-        const vm = this;
+      addAddress () {
+        const vm = this
         api.post('/address/add', {
           name: vm.name,
           mobile: vm.mobile,
@@ -63,8 +64,12 @@
           if (res.code === 200) {
             Toast({
               message: '添加成功',
-            });
-            vm.$router.push({path: '/address'})
+            })
+            if (this.$route.query.select) {
+              vm.$router.push({path: '/confirmOrder'})
+            } else {
+              vm.$router.push({path: '/address'})
+            }
           }
         })
       },
@@ -77,7 +82,7 @@
           console.log(values, displayValues)
           vm.addressArea = displayValues
         }
-      });
+      })
     }
   }
 </script>
@@ -87,16 +92,19 @@
 
   .content {
     overflow: hidden;
+
     .form {
       width: 100%;
       overflow: hidden;
       background-color: #ffffff;
       padding: 0 px2rem(24px);
       box-sizing: border-box;
+
       .phone {
         min-height: px2rem(56px);
         display: flex;
         margin: px2rem(12px) 0;
+
         .label {
           width: px2rem(130px);
           font-size: px2rem(24px);
@@ -104,6 +112,7 @@
           line-height: px2rem(60px);
           white-space: nowrap;
         }
+
         .input {
           flex: 1;
           height: px2rem(58px);
@@ -112,9 +121,11 @@
           margin-left: px2rem(20px);
           border: none;
         }
+
         .input:focus, .code:focus {
           outline: none;
         }
+
         .address {
           min-height: px2rem(58px);
           margin-left: px2rem(20px);
@@ -126,13 +137,16 @@
           color: #878b8a;
           font-size: px2rem(24px);
         }
+
         .address:focus {
           outline: none;
         }
       }
+
       .phone.bottom {
         height: px2rem(60px);
         border-bottom: px2rem(1px) solid #DFDFDF;
+
         .select {
           width: px2rem(400px);
           margin-top: px2rem(14px);
@@ -141,6 +155,7 @@
         }
       }
     }
+
     .btn {
       position: absolute;
       bottom: px2rem(20px);
@@ -149,6 +164,7 @@
       height: px2rem(60px);
       padding: 0 px2rem(24px);
       box-sizing: border-box;
+
       .login {
         width: 100%;
         height: 100%;

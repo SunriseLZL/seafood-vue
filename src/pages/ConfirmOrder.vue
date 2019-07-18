@@ -49,11 +49,11 @@
 
 
 <script>
-  import api from '@/api/api';
-  import {MessageBox, Toast} from 'mint-ui';
+  import api from '@/api/api'
+  import {MessageBox, Toast} from 'mint-ui'
 
   export default {
-    data() {
+    data () {
       return {
         orderNote: '',
         orderId: '',
@@ -67,61 +67,61 @@
           mobile: '',
           address: ''
         }
-      };
+      }
     },
     computed: {
-      totalPrice() {
-        let total = 0;
+      totalPrice () {
+        let total = 0
         if (this.goodsList && this.goodsList.length > 0) {
           this.goodsList.forEach(item => {
             if (item.amount >= 30) {
-              total += item.wholesalePrice * item.amount;
+              total += item.wholesalePrice * item.amount
             } else {
-              total += item.retailPrice * item.amount;
+              total += item.retailPrice * item.amount
             }
-          });
+          })
         }
-        return total.toFixed(2);
+        return total.toFixed(2)
       }
     },
     methods: {
-      toAddAddress() {
-        this.$router.replace({path: '/addAddress'});
+      toAddAddress () {
+        this.$router.replace({path: '/addAddress', query: {select: 1}})
       },
-      toShoppingCart() {
-        this.$router.push({path: '/shoppingCart'});
+      toShoppingCart () {
+        this.$router.push({path: '/shoppingCart'})
       },
-      changeAdd() {
-        this.$router.push({path: '/address', query: {change: 1}});
+      changeAdd () {
+        this.$router.push({path: '/address', query: {change: 1}})
       },
-      getAddress() {
+      getAddress () {
         api.post('/address/select', {'userId': localStorage.getItem('userId')}).then(res => {
           if (res.code === 200) {
-            this.addressList = res.data;
-            let addressId = this.$route.query.addressId;
+            this.addressList = res.data
+            let addressId = this.$route.query.addressId
             if (addressId) {
-              let address = this.addressList.find(item => item.id === addressId);
+              let address = this.addressList.find(item => item.id === addressId)
               this.addressInfo = {
                 id: address.id,
                 name: address.name,
                 mobile: address.mobile,
                 address: address.addressArea + address.addressDetail,
-              };
+              }
             } else {
               this.addressInfo = {
                 id: this.addressList[0].id,
                 name: this.addressList[0].name,
                 mobile: this.addressList[0].mobile,
                 address: this.addressList[0].addressArea + this.addressList[0].addressDetail,
-              };
+              }
             }
           }
-        });
+        })
       },
-      addOrder() {
+      addOrder () {
         if (!this.addressList.length) {
-          MessageBox.alert('请先填写收获地址', '提示');
-          return false;
+          MessageBox.alert('请先填写收获地址', '提示')
+          return false
         }
         // 添加订单获取订单id后支付
         api.post('/order/add', {
@@ -130,55 +130,55 @@
             return {
               'goodsId': item.id,
               'goodsNum': item.amount
-            };
+            }
           }),
           goodsTotal: this.totalPrice,
           orderNote: this.orderNote,
           addressId: this.addressInfo.id,
         }).then(res => {
           if (res.code === 200) {
-            this.orderId = res.data.orderId;
-            this.wxPay();
+            this.orderId = res.data.orderId
+            this.wxPay()
           }
-        });
+        })
       },
-      wxPay() {
+      wxPay () {
         api.post('/wx/orderPay', {orderId: this.orderId, openId: this.openId}).then(res => {
           if (res.code === 200) {
-            this.payObject = res.data;
+            this.payObject = res.data
             if (typeof WeixinJSBridge == 'undefined') {
               if (document.addEventListener) {
-                document.addEventListener('WeixinJSBridgeReady', this.onBridgeReady, false);
+                document.addEventListener('WeixinJSBridgeReady', this.onBridgeReady, false)
               } else if (document.attachEvent) {
-                document.attachEvent('WeixinJSBridgeReady', this.onBridgeReady);
-                document.attachEvent('onWeixinJSBridgeReady', this.onBridgeReady);
+                document.attachEvent('WeixinJSBridgeReady', this.onBridgeReady)
+                document.attachEvent('onWeixinJSBridgeReady', this.onBridgeReady)
               }
             } else {
-              this.onBridgeReady();
+              this.onBridgeReady()
             }
           }
-        });
+        })
       },
-      onBridgeReady() {
+      onBridgeReady () {
         WeixinJSBridge.invoke(
           'getBrandWCPayRequest', this.payObject,
           function (res) {
             if (res.err_msg === 'get_brand_wcpay_request:ok') {
-              MessageBox('提示', '支付成功!');
+              MessageBox('提示', '支付成功!')
             } else {
-              MessageBox('提示', '支付失败!');
+              MessageBox('提示', '支付失败!')
             }
           }
-        );
+        )
       },
     },
-    mounted() {
-      this.goodsList = JSON.parse(localStorage.getItem('goodsList'));
-      console.log(this.goodsList);
-      this.getAddress();
-      this.openId = localStorage.getItem('openId');
+    mounted () {
+      this.goodsList = JSON.parse(localStorage.getItem('goodsList'))
+      console.log(this.goodsList)
+      this.getAddress()
+      this.openId = localStorage.getItem('openId')
     }
-  };
+  }
 </script>
 
 <style lang="scss" scoped="" rel="stylesheet/scss">
