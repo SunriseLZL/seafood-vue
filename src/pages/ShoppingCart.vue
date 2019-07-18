@@ -1,7 +1,8 @@
 <template>
   <div>
     <mt-header :title="`购物车(${totalCount})`" class="header">
-      <mt-button slot="right">编辑</mt-button>
+      <mt-button slot="right" @click="editAble = true" v-if="!editAble">编辑</mt-button>
+      <mt-button slot="right" @click="editAble = false" v-else>完成</mt-button>
     </mt-header>
 
     <div class="goods-list">
@@ -19,7 +20,12 @@
           </p>
         </div>
         <div class="buy">
-          <div class="core-buy">x{{good.amount}}</div>
+          <div class="core-buy" v-if="editAble">
+            <div class="circle-plus" @click="delAmount(good.id)"><i class="fa fa-minus-circle fa-fw"></i></div>
+            <input placeholder="0" class="input-number" v-model="good.amount"/>
+            <div class="circle-plus" @click="addAmount(good.id)"><i class="fa fa-plus-circle fa-fw"></i></div>
+          </div>
+          <div class="core-buy" v-else>x{{good.amount}}</div>
         </div>
       </div>
     </div>
@@ -44,111 +50,134 @@
 </template>
 
 <script>
-  import api from '@/api/api';
-  import {MessageBox, Toast} from 'mint-ui';
+  import api from '@/api/api'
+  import {MessageBox, Toast} from 'mint-ui'
 
   export default {
-    data() {
+    data () {
       return {
         food_count: 10,
         selectCount: 0,
         editAble: false,
         goodsList: []
-      };
+      }
     },
     computed: {
-      all() {
+      all () {
         for (let i = 0; i < this.goodsList.length; i++) {
           if (!this.goodsList[i].select) {
-            return false;
+            return false
           }
         }
-        return true;
+        return true
       },
-      totalCount() {
-        return this.goodsList.length;
+      totalCount () {
+        return this.goodsList.length
       },
-      totalPrice() {
-        let total = 0;
-        let amount = this.goodsList.length;
+      totalPrice () {
+        let total = 0
+        let amount = this.goodsList.length
         if (amount > 10) {
           this.goodsList.forEach(item => {
             if (item.select) {
-              total += item.wholesalePrice * item.amount;
+              total += item.wholesalePrice * item.amount
             }
-          });
-          return total;
+          })
+          return total
         } else {
           this.goodsList.forEach(item => {
             if (item.select) {
-              total += item.retailPrice * item.amount;
+              total += item.retailPrice * item.amount
             }
-          });
-          return total;
+          })
+          return total
         }
 
       }
     },
     methods: {
-      toShoppingCart() {
-        this.$router.push({path: '/shoppingCart'});
+      toShoppingCart () {
+        this.$router.push({path: '/shoppingCart'})
       },
-      getIndex(index) {
-        console.log(index);
+      getIndex (index) {
+        console.log(index)
       },
-      submitOrder() {
-        let count = 0;
-        const goodsList = [];
+      addAmount (id) {
+        this.goodsList.map((item, index) => {
+          console.log(item, id)
+          if (item.id === id) {
+            this.$set(this.goodsList, index, {
+              ...this.goodsList[index],
+              amount: this.goodsList[index].amount + 1
+            })
+          }
+        })
+      },
+      delAmount (id) {
+        this.goodsList.map((item, index) => {
+          if (item.id === id) {
+            if (this.goodsList[index].amount > 0) {
+              this.$set(this.goodsList, index, {
+                ...this.goodsList[index],
+                amount: this.goodsList[index].amount - 1
+              })
+            }
+          }
+        })
+      },
+      submitOrder () {
+        let count = 0
+        const goodsList = []
         this.goodsList.map(item => {
-          console.log(item);
+          console.log(item)
           if (item.select) {
-            count++;
+            count++
             goodsList.push({
               ...item
-            });
+            })
           }
-        });
-        this.selectCount = count;
+        })
+        this.selectCount = count
         if (this.selectCount > 0) {
-          localStorage.setItem('goodsList', JSON.stringify(goodsList));
-          this.$router.push({path: '/confirmOrder'});
+          localStorage.setItem('goodsList', JSON.stringify(goodsList))
+          this.$router.push({path: '/confirmOrder'})
         } else {
-          MessageBox.alert('您还未选择商品哦~', '提示');
+          MessageBox.alert('您还未选择商品哦~', '提示')
         }
       },
-      choose(id) {
+      choose (id) {
         this.goodsList.map((item, index) => {
           if (item.id === id) {
             this.$set(this.goodsList, index, {
               ...this.goodsList[index],
               select: !this.goodsList[index].select
-            });
+            })
           }
-        });
+        })
       },
-      pickAll() {
+      pickAll () {
         if (this.all) {
           this.goodsList.map((item, index) => {
             this.$set(this.goodsList, index, {
               ...this.goodsList[index],
               select: false
-            });
-          });
+            })
+          })
         } else {
           this.goodsList.map((item, index) => {
             this.$set(this.goodsList, index, {
               ...this.goodsList[index],
               select: true
-            });
-          });
+            })
+          })
         }
       },
     },
-    mounted() {
-      this.goodsList = JSON.parse(localStorage.getItem('goodsList'));
-      console.log(this.goodsList);
+    mounted () {
+      this.goodsList = JSON.parse(localStorage.getItem('goodsList'))
+      console.log(this.goodsList)
     }
-  };
+  }
 </script>
 
 <style lang="scss" scoped="" rel="stylesheet/scss">
@@ -165,6 +194,7 @@
       width: px2rem(160px);
       height: px2rem(130px);
       display: block;
+
       img {
         width: 100%;
         height: 100%;
