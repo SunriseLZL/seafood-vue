@@ -5,38 +5,45 @@
 </template>
 
 <script>
-  import api from '@/api/api';
+  import api from '@/api/api'
 
   export default {
-    data() {
+    data () {
       return {
         openId: '',
-        loadFinish: true
-      };
-    },
-    methods: {
-      getOpenId() {
-        api.post('/user/getOpenId').then(res => {
-          if (res.code === 200) {
-            this.openId = res.data.openId;
-            if (this.openId === '') {
-              window.location.href = 'http://hbzkzpp.cn/api/wx/getOpenId';
-            } else {
-              localStorage.setItem('openId', this.openId);
-              this.loadFinish = true;
-            }
-          } else {
-            window.location.href = 'http://hbzkzpp.cn/api/wx/getOpenId';
-          }
-        }).catch(err => {
-          window.location.href = 'http://hbzkzpp.cn/api/wx/getOpenId';
-        });
+        userId: '',
+        loadFinish: false
       }
     },
-    mounted() {
-      // this.getOpenId();
+    methods: {
+      getOpenId () {
+        api.post('/user/getOpenId').then(res => {
+          if (res.code === 200) {
+            this.openId = res.data.openId
+            if (this.openId === '') {
+              window.location.href = 'http://hbzkzpp.cn/api/wx/getOpenId'
+            } else {
+              localStorage.setItem('openId', this.openId)
+              api.post('/user/getUserId', {openId: this.openId}).then(res => {
+                if (res.code === 200) {
+                  this.userId = res.data.userId
+                  localStorage.setItem('userId', this.userId)
+                  this.loadFinish = true
+                }
+              })
+            }
+          } else {
+            window.location.href = 'http://hbzkzpp.cn/api/wx/getOpenId'
+          }
+        }).catch(err => {
+          window.location.href = 'http://hbzkzpp.cn/api/wx/getOpenId'
+        })
+      }
+    },
+    mounted () {
+      this.getOpenId()
     }
-  };
+  }
 </script>
 
 <style>

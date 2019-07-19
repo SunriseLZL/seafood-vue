@@ -111,16 +111,10 @@
         }).catch((error) => {
           console.log(error);
         });
-      },
-      aaa() {
-        api.post('/user/getOpenId').then(res => {
-          console.log(res);
-        });
       }
     },
     mounted() {
       this.getGoodsList();
-      this.aaa();
     }
   };
 </script>
