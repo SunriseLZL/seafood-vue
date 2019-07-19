@@ -58,7 +58,7 @@
       goodsTotal() {
         let total = 0;
         this.goodsList.forEach((item) => {
-          total += item.amount;
+          total += Number(item.amount);
         });
         return total;
       }
