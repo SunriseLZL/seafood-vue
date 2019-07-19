@@ -116,7 +116,7 @@
           float: left;
           width: px2rem(132px);
           margin-top: px2rem(32px);
-          font-size: px2rem(30px);
+          font-size: px2rem(24px);
           color: #3F3F3F;
         }
 
@@ -125,7 +125,7 @@
           width: px2rem(380px);
           height: px2rem(60px);
           color: #989898;
-          font-size: px2rem(30px);
+          font-size: px2rem(24px);
           margin-top: px2rem(24px);
           margin-left: px2rem(30px);
           border: none;
@@ -153,6 +153,9 @@
           margin-left: px2rem(24px);
           margin-top: px2rem(32px);
           margin-bottom: px2rem(70px);
+          font-family: 微软雅黑, "Microsoft YaHei", "Helvetica Neue", "Helvetica Neue", Helvetica, "Hiragino Sans GB", tahoma, arial, sans-serif;
+          color: #878b8a;
+          font-size: px2rem(24px);
           border: none;
           resize: none;
         }
