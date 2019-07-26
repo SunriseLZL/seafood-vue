@@ -6,7 +6,7 @@
 </template>
 
 <script>
-  import Foot from './components/foot.vue'
+  import Foot from './components/Foot.vue'
 
   export default {
     data () {
